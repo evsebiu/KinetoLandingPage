@@ -5,11 +5,11 @@ import com.example.KinetoWebsite.Repository.ServiceDetailsRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ServiceDetailsImpl {
+public class ServiceDetailsServiceImpl {
 
     private final ServiceDetailsRepository serviceDetailsRepo;
 
-    public ServiceDetailsImpl(ServiceDetailsRepository serviceDetailsRepo){
+    public ServiceDetailsServiceImpl(ServiceDetailsRepository serviceDetailsRepo){
         this.serviceDetailsRepo = serviceDetailsRepo;
     }
 

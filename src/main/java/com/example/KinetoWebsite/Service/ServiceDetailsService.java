@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public interface ServiceDetails {
+public interface ServiceDetailsService {
 
     // GET
-    List<ServiceDetails> getAllServices();
-    Optional<ServiceDetails> getServiceByName(String numeServiciu);
-    List<ServiceDetails> getServiceByPrice(Integer pretServiciu);
-    List<ServiceDetails> getServiceByDuration(Integer duration);
+    List<ServiceDetailsService> getAllServices();
+    Optional<ServiceDetailsService> getServiceByName(String numeServiciu);
+    List<ServiceDetailsService> getServiceByPrice(Integer pretServiciu);
+    List<ServiceDetailsService> getServiceByDuration(Integer duration);
 
     //business logic
     ServiceDetailsDTO createService(ServiceDetailsDTO serviceDetailsDTO);
