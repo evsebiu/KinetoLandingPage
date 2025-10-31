@@ -58,7 +58,7 @@ This project is primarily a landing page. There is no exposed API for external c
 
 ## Configuration Options
 
-The application's properties can be configured through the `application.properties` or `application.yml` file (not shown in provided structure, but typical).  Common configuration options might include:
+The application's properties can be configured through the `application.properties` file.
 
 *   **Server Port:**  `server.port` (defaults to 8080).
 *   **Database Connection:** (If a database were added, properties would configure the connection).
@@ -77,7 +77,7 @@ Please adhere to the existing code style and conventions.
 
 ## License Information
 
-This project is licensed under [Specify License Here - e.g., MIT License].  If no license is specified, all rights are reserved by the owner.
+This project is licensed under [MIT License].
 
 ## Acknowledgments
 
