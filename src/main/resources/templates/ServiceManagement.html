@@ -17,21 +17,39 @@
             border-radius: 5px;
             margin: 5px 0;
         }
+        .sidebar .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.2);
+        }
         .service-card {
             transition: transform 0.2s;
             border: none;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
         }
         .service-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .badge-duration {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .badge-price {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        .search-box {
+            max-width: 300px;
         }
     </style>
 </head>
 <body>
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar (same as dashboard) -->
+        <!-- Sidebar -->
         <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
             <div class="position-sticky pt-3">
                 <div class="text-center mb-4">
@@ -45,28 +63,65 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" th:href="@{/api/admin/services}">
+                        <a class="nav-link active" th:href="@{/admin/services}">
                             <i class="fas fa-spa me-2"></i>
                             Servicii
                         </a>
                     </li>
-                    <!-- Other menu items same as dashboard -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/appointments}">
+                            <i class="fas fa-calendar me-2"></i>
+                            Programări
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/public}" target="_blank">
+                            <i class="fas fa-eye me-2"></i>
+                            Vezi Site Public
+                        </a>
+                    </li>
                 </ul>
             </div>
         </nav>
 
         <!-- Main content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Header -->
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2">Gestionare Servicii</h1>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-2"></i>Administrator
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <form th:action="@{/logout}" method="post" style="display: inline;">
+                                    <button type="submit" class="dropdown-item">Deconectare</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Add Button -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="search-box">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Caută servicii..." id="searchInput">
+                        <button class="btn btn-outline-secondary" type="button" onclick="searchServices()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#serviceModal" onclick="openAddModal()">
                     <i class="fas fa-plus me-1"></i>Adaugă Serviciu
                 </button>
             </div>
 
             <!-- Services Grid -->
             <div class="row" id="servicesContainer">
-                <!-- Services will be loaded here via JavaScript -->
                 <div class="col-12 text-center">
                     <div class="spinner-border" role="status">
                         <span class="visually-hidden">Se încarcă...</span>
@@ -77,131 +132,223 @@
     </div>
 </div>
 
-<!-- Add Service Modal -->
-<div class="modal fade" id="addServiceModal" tabindex="-1">
+<!-- Service Modal (Add/Edit) -->
+<div class="modal fade" id="serviceModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Adaugă Serviciu Nou</h5>
+                <h5 class="modal-title" id="modalTitle">Adaugă Serviciu Nou</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="addServiceForm">
+                <form id="serviceForm">
+                    <input type="hidden" id="serviceId" name="id">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="numeServiciu" class="form-label">Nume Serviciu *</label>
                             <input type="text" class="form-control" id="numeServiciu" name="numeServiciu" required>
+                            <div class="invalid-feedback">Numele serviciului este obligatoriu.</div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="pretServiciu" class="form-label">Preț (RON) *</label>
-                            <input type="number" class="form-control" id="pretServiciu" name="pretServiciu" min="0" required>
+                            <input type="number" class="form-control" id="pretServiciu" name="pretServiciu" min="0" step="0.01" required>
+                            <div class="invalid-feedback">Prețul este obligatoriu.</div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="durataServiciu" class="form-label">Durată (minute) *</label>
                             <input type="number" class="form-control" id="durataServiciu" name="durataServiciu" min="1" required>
+                            <div class="invalid-feedback">Durata este obligatorie.</div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="contact" class="form-label">Contact *</label>
                             <input type="tel" class="form-control" id="contact" name="contact" required>
+                            <div class="invalid-feedback">Contactul este obligatoriu.</div>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="descriereServiciu" class="form-label">Descriere</label>
-                        <textarea class="form-control" id="descriereServiciu" name="descriereServiciu" rows="3"></textarea>
+                        <textarea class="form-control" id="descriereServiciu" name="descriereServiciu" rows="3" placeholder="Descrierea serviciului..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="categorie" class="form-label">Categorie</label>
+                        <input type="text" class="form-control" id="categorie" name="categorie" placeholder="ex: Masaj, Fizioterapie">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
-                <button type="button" class="btn btn-primary" onclick="addService()">Salvează Serviciu</button>
+                <button type="button" class="btn btn-primary" onclick="saveService()">Salvează Serviciu</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Edit Service Modal -->
-<div class="modal fade" id="editServiceModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Modifică Serviciu</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editServiceForm">
-                    <input type="hidden" id="editServiceId">
-                    <!-- Same form fields as add service -->
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
-                <button type="button" class="btn btn-primary" onclick="updateService()">Actualizează</button>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Success/Error Alerts -->
+<div id="alertContainer" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    let currentServices = [];
+    let editMode = false;
+
     // Load services when page loads
     document.addEventListener('DOMContentLoaded', function() {
         loadServices();
     });
 
+    function showAlert(message, type) {
+        const alertContainer = document.getElementById('alertContainer');
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
+        alert.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        alertContainer.appendChild(alert);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.remove();
+            }
+        }, 5000);
+    }
+
     function loadServices() {
         fetch('/api/admin/services')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(services => {
-                const container = document.getElementById('servicesContainer');
-                container.innerHTML = '';
-
-                services.forEach(service => {
-                    const serviceCard = `
-                        <div class="col-md-6 col-lg-4 mb-4">
-                            <div class="card service-card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">${service.numeServiciu}</h5>
-                                    <p class="card-text text-muted">${service.descriereServiciu}</p>
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="badge bg-primary">${service.pretServiciu} RON</span>
-                                        <span class="badge bg-secondary">${service.durataServiciu} min</span>
-                                    </div>
-                                    <p class="card-text"><small class="text-muted">Contact: ${service.contact}</small></p>
-                                </div>
-                                <div class="card-footer bg-transparent">
-                                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editService(${service.id})">
-                                        <i class="fas fa-edit"></i> Modifică
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteService(${service.id})">
-                                        <i class="fas fa-trash"></i> Șterge
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    container.innerHTML += serviceCard;
-                });
+                currentServices = services;
+                renderServices(services);
             })
             .catch(error => {
                 console.error('Error loading services:', error);
-                document.getElementById('servicesContainer').innerHTML =
-                    '<div class="col-12 text-center text-danger">Eroare la încărcarea serviciilor</div>';
+                showAlert('Eroare la încărcarea serviciilor!', 'danger');
             });
     }
 
-    function addService() {
+    function renderServices(services) {
+        const container = document.getElementById('servicesContainer');
+
+        if (services.length === 0) {
+            container.innerHTML = `
+                <div class="col-12 text-center">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Nu există servicii în sistem. Adaugă primul serviciu!
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = services.map(service => `
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card service-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">${escapeHtml(service.numeServiciu)}</h5>
+                        ${service.categorie ? `<span class="badge bg-secondary mb-2">${escapeHtml(service.categorie)}</span>` : ''}
+                        <p class="card-text text-muted">${escapeHtml(service.descriereServiciu || 'Fără descriere')}</p>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge badge-price">${service.pretServiciu} RON</span>
+                            <span class="badge badge-duration">${service.durataServiciu} min</span>
+                        </div>
+                        <p class="card-text"><small class="text-muted">Contact: ${escapeHtml(service.contact)}</small></p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editService(${service.id})">
+                            <i class="fas fa-edit"></i> Modifică
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteService(${service.id})">
+                            <i class="fas fa-trash"></i> Șterge
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function searchServices() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const filteredServices = currentServices.filter(service =>
+            service.numeServiciu.toLowerCase().includes(searchTerm) ||
+            (service.descriereServiciu && service.descriereServiciu.toLowerCase().includes(searchTerm)) ||
+            (service.categorie && service.categorie.toLowerCase().includes(searchTerm))
+        );
+        renderServices(filteredServices);
+    }
+
+    function openAddModal() {
+        editMode = false;
+        document.getElementById('modalTitle').textContent = 'Adaugă Serviciu Nou';
+        document.getElementById('serviceForm').reset();
+        document.getElementById('serviceId').value = '';
+
+        // Remove validation classes
+        const inputs = document.querySelectorAll('#serviceForm input, #serviceForm textarea');
+        inputs.forEach(input => {
+            input.classList.remove('is-invalid');
+        });
+    }
+
+    function editService(serviceId) {
+        const service = currentServices.find(s => s.id === serviceId);
+        if (!service) {
+            showAlert('Serviciul nu a fost găsit!', 'danger');
+            return;
+        }
+
+        editMode = true;
+        document.getElementById('modalTitle').textContent = 'Modifică Serviciu';
+
+        // Fill form with service data
+        document.getElementById('serviceId').value = service.id;
+        document.getElementById('numeServiciu').value = service.numeServiciu || '';
+        document.getElementById('descriereServiciu').value = service.descriereServiciu || '';
+        document.getElementById('pretServiciu').value = service.pretServiciu || '';
+        document.getElementById('durataServiciu').value = service.durataServiciu || '';
+        document.getElementById('contact').value = service.contact || '';
+        document.getElementById('categorie').value = service.categorie || '';
+
+        // Remove validation classes
+        const inputs = document.querySelectorAll('#serviceForm input, #serviceForm textarea');
+        inputs.forEach(input => {
+            input.classList.remove('is-invalid');
+        });
+
+        const modal = new bootstrap.Modal(document.getElementById('serviceModal'));
+        modal.show();
+    }
+
+    function saveService() {
         const formData = {
-            numeServiciu: document.getElementById('numeServiciu').value,
-            descriereServiciu: document.getElementById('descriereServiciu').value,
-            pretServiciu: parseInt(document.getElementById('pretServiciu').value),
+            numeServiciu: document.getElementById('numeServiciu').value.trim(),
+            descriereServiciu: document.getElementById('descriereServiciu').value.trim(),
+            pretServiciu: parseFloat(document.getElementById('pretServiciu').value),
             durataServiciu: parseInt(document.getElementById('durataServiciu').value),
-            contact: document.getElementById('contact').value
+            contact: document.getElementById('contact').value.trim(),
+            categorie: document.getElementById('categorie').value.trim()
         };
 
-        fetch('/api/admin/services', {
-            method: 'POST',
+        const serviceId = document.getElementById('serviceId').value;
+
+        // Validation
+        if (!validateForm(formData)) {
+            return;
+        }
+
+        const url = editMode ? `/api/admin/services/${serviceId}` : '/api/admin/services';
+        const method = editMode ? 'PUT' : 'POST';
+
+        fetch(url, {
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -209,31 +356,95 @@
         })
         .then(response => {
             if (response.ok) {
-                $('#addServiceModal').modal('hide');
-                document.getElementById('addServiceForm').reset();
-                loadServices();
+                return response.json();
+            } else {
+                throw new Error('Failed to save service');
             }
         })
-        .catch(error => console.error('Error adding service:', error));
+        .then(() => {
+            // Close modal and reset form
+            const modal = bootstrap.Modal.getInstance(document.getElementById('serviceModal'));
+            modal.hide();
+            document.getElementById('serviceForm').reset();
+
+            // Reload services and show success message
+            loadServices();
+            showAlert(`Serviciu ${editMode ? 'modificat' : 'adăugat'} cu succes!`, 'success');
+        })
+        .catch(error => {
+            console.error('Error saving service:', error);
+            showAlert(`Eroare la ${editMode ? 'modificarea' : 'adăugarea'} serviciului!`, 'danger');
+        });
     }
 
-    function editService(serviceId) {
-        // Implementation for edit
+    function validateForm(formData) {
+        let isValid = true;
+
+        // Reset validation
+        const inputs = document.querySelectorAll('#serviceForm input[required]');
+        inputs.forEach(input => {
+            input.classList.remove('is-invalid');
+        });
+
+        // Check required fields
+        if (!formData.numeServiciu) {
+            document.getElementById('numeServiciu').classList.add('is-invalid');
+            isValid = false;
+        }
+        if (!formData.pretServiciu || formData.pretServiciu <= 0) {
+            document.getElementById('pretServiciu').classList.add('is-invalid');
+            isValid = false;
+        }
+        if (!formData.durataServiciu || formData.durataServiciu <= 0) {
+            document.getElementById('durataServiciu').classList.add('is-invalid');
+            isValid = false;
+        }
+        if (!formData.contact) {
+            document.getElementById('contact').classList.add('is-invalid');
+            isValid = false;
+        }
+
+        return isValid;
     }
 
     function deleteService(serviceId) {
-        if (confirm('Sigur doriți să ștergeți acest serviciu?')) {
-            fetch(`/api/admin/services/${serviceId}`, {
-                method: 'DELETE'
-            })
-            .then(response => {
-                if (response.ok) {
-                    loadServices();
-                }
-            })
-            .catch(error => console.error('Error deleting service:', error));
+        if (!confirm('Sigur doriți să ștergeți acest serviciu?')) {
+            return;
         }
+
+        fetch(`/api/admin/services/${serviceId}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (response.ok) {
+                loadServices();
+                showAlert('Serviciu șters cu succes!', 'success');
+            } else {
+                throw new Error('Failed to delete service');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting service:', error);
+            showAlert('Eroare la ștergerea serviciului!', 'danger');
+        });
     }
+
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Enable search on Enter key
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchServices();
+        }
+    });
 </script>
 </body>
 </html>

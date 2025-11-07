@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kineto - Masaj Terapeutic la Domiciliu în Iași</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #28a745;
+            --text-dark: #2d3748;
+            --text-light: #718096;
+            --background-light: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        /* Header & Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            margin: 0 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 120px 0 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" opacity="0.1"><polygon fill="white" points="0,1000 1000,0 1000,1000"/></svg>');
+            background-size: cover;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background: var(--background-light);
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            border: none;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .feature-icon i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        /* Services Section */
+        .services {
+            padding: 80px 0;
+        }
+
+        .service-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+            margin-bottom: 2rem;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .service-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .service-body {
+            padding: 2rem;
+        }
+
+        .price-tag {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        /* Appointment Section */
+        .appointment {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+
+        .appointment-card {
+            background: white;
+            color: var(--text-dark);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 60px 0 30px;
+        }
+
+        .footer h5 {
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .footer a {
+            color: #cbd5e0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: white;
+        }
+
+        .copyright {
+            border-top: 1px solid #4a5568;
+            padding-top: 2rem;
+            margin-top: 3rem;
+            text-align: center;
+            color: #a0aec0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .feature-card, .appointment-card {
+                padding: 2rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* No Services State */
+        .no-services {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        }
+
+        .no-services i {
+            font-size: 4rem;
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-spa me-2"></i>Kineto
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="#home">Acasă</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="#servicii">Servicii</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="#despre">Despre</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="#contact">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section id="home" class="hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 hero-content">
+                <h1>Masaj Kineto Profesional la Domiciliu în Iași</h1>
+                <p class="lead">Alinerea durerilor și recuperarea mobilității în confortul casei dumneavoastră. Servicii profesionale de kinetoterapie și masaj terapeutic.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="#servicii" class="btn btn-light btn-lg px-4 py-2">
+                        <i class="fas fa-spa me-2"></i>Vezi Serviciile
+                    </a>
+                    <a href="#programare" class="btn btn-outline-light btn-lg px-4 py-2">
+                        <i class="fas fa-phone me-2"></i>Programează-te
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="hero-image mt-5 mt-lg-0">
+                    <i class="fas fa-hands-helping" style="font-size: 300px; opacity: 0.3;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3">De ce să alegi Kineto?</h2>
+                <p class="lead text-muted">Servicii de calitate superioară, adaptate nevoilor dumneavoastră</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <h4>La Domiciliu</h4>
+                    <p class="text-muted">Vă aducem serviciile direct la domiciliu în orașul Iași. Nu mai este nevoie să vă deplasați.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h4>Terapeuți Experiențați</h4>
+                    <p class="text-muted">Echipa noastră este formată din specialiști cu experiență în kinetoterapie și masaj terapeutic.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h4>Program Flexibil</h4>
+                    <p class="text-muted">Lucrăm conform programărilor dumneavoastră, inclusiv în weekend, pentru confortul maxim.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section id="servicii" class="services">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3">Serviciile Noastre</h2>
+                <p class="lead text-muted">Gama completă de servicii de kinetoterapie și masaj terapeutic</p>
+            </div>
+        </div>
+
+        <div id="servicesContainer">
+            <!-- Services will be loaded here via JavaScript -->
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="despre" class="features">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h2 class="display-6 fw-bold mb-4">Despre Kineto</h2>
+                <p class="lead mb-4">Kineto este un serviciu specializat în oferirea de tratamente de kinetoterapie și masaj terapeutic la domiciliul clienților din Iași.</p>
+                <div class="mb-4">
+                    <h5><i class="fas fa-check-circle text-success me-2"></i>Servicii personalizate</h5>
+                    <p class="text-muted">Fiecare tratament este adaptat nevoilor specifice ale fiecărui client.</p>
+                </div>
+                <div class="mb-4">
+                    <h5><i class="fas fa-check-circle text-success me-2"></i>Echipamente profesionale</h5>
+                    <p class="text-muted">Folosim doar echipamente și tehnici de ultimă generație.</p>
+                </div>
+                <div class="mb-4">
+                    <h5><i class="fas fa-check-circle text-success me-2"></i>Rezultate garantate</h5>
+                    <p class="text-muted">Mii de clienți mulțumiți și rezultate vizibile în scurt timp.</p>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="p-5">
+                    <i class="fas fa-heartbeat" style="font-size: 200px; color: var(--primary-color); opacity: 0.7;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Appointment Section -->
+<section id="programare" class="appointment">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="appointment-card">
+                    <div class="text-center mb-5">
+                        <h2 class="display-6 fw-bold mb-3">Programează-te Acum</h2>
+                        <p class="text-muted">Completează formularul de mai jos și te vom contacta în cel mai scurt timp</p>
+                    </div>
+
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Important:</strong> Programările se fac exclusiv în baza numărului de telefon. Vă vom contacta pentru confirmare.
+                    </div>
+
+                    <form id="appointmentForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Nume complet *</label>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Număr de telefon *</label>
+                                <input type="tel" class="form-control" id="phone" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="service" class="form-label">Serviciu dorit *</label>
+                                <select class="form-select" id="service" required>
+                                    <option value="">Selectează serviciul</option>
+                                    <!-- Services will be populated via JavaScript -->
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="date" class="form-label">Dată preferată</label>
+                                <input type="date" class="form-control" id="date">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="message" class="form-label">Mesaj (opțional)</label>
+                            <textarea class="form-control" id="message" rows="4" placeholder="Descrieți problema sau cerințele speciale..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 py-3">
+                            <i class="fas fa-paper-plane me-2"></i>Trimite Cererea
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="services">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3">Contact</h2>
+                <p class="lead text-muted">Suntem aici pentru a vă ajuta</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 text-center mb-4">
+                <div class="feature-icon" style="width: 60px; height: 60px;">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <h5>Telefon</h5>
+                <p class="text-muted">Programări prin telefon</p>
+                <a href="tel:+40712345678" class="btn btn-outline-primary">+40 712 345 678</a>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="feature-icon" style="width: 60px; height: 60px;">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <h5>Locație</h5>
+                <p class="text-muted">Servicii la domiciliu</p>
+                <span class="text-primary fw-bold">Iași și împrejurimi</span>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="feature-icon" style="width: 60px; height: 60px;">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h5>Program</h5>
+                <p class="text-muted">Luni - Duminică</p>
+                <span class="text-primary fw-bold">8:00 - 20:00</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <h5><i class="fas fa-spa me-2"></i>Kineto</h5>
+                <p>Servicii profesionale de masaj kineto și kinetoterapie la domiciliu în Iași. Calitate, profesionalism și rezultate.</p>
+            </div>
+            <div class="col-lg-2 mb-4">
+                <h5>Link-uri rapide</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#home">Acasă</a></li>
+                    <li class="mb-2"><a href="#servicii">Servicii</a></li>
+                    <li class="mb-2"><a href="#despre">Despre</a></li>
+                    <li class="mb-2"><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 mb-4">
+                <h5>Contact</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-phone me-2"></i>+40 712 345 678</li>
+                    <li class="mb-2"><i class="fas fa-envelope me-2"></i>contact@kineto.ro</li>
+                    <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>Iași, România</li>
+                </ul>
+            </div>
+            <div class="col-lg-3 mb-4">
+                <h5>Urmează-ne</h5>
+                <div class="d-flex gap-3">
+                    <a href="#" class="text-light"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="#" class="text-light"><i class="fab fa-instagram fa-2x"></i></a>
+                    <a href="#" class="text-light"><i class="fab fa-whatsapp fa-2x"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2024 Kineto. Toate drepturile rezervate.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Load services from your backend API
+    document.addEventListener('DOMContentLoaded', function() {
+        loadServices();
+        setupForm();
+        setupSmoothScroll();
+    });
+
+    function loadServices() {
+        fetch('/api/public/services')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(services => {
+                displayServices(services);
+                populateServiceDropdown(services);
+            })
+            .catch(error => {
+                console.error('Error loading services:', error);
+                showNoServices();
+            });
+    }
+
+    function displayServices(services) {
+        const container = document.getElementById('servicesContainer');
+
+        if (!services || services.length === 0) {
+            showNoServices();
+            return;
+        }
+
+        container.innerHTML = services.map(service => `
+            <div class="col-lg-6">
+                <div class="service-card">
+                    <div class="service-header">
+                        <h4 class="mb-0">${service.numeServiciu || 'Serviciu'}</h4>
+                    </div>
+                    <div class="service-body">
+                        <div class="price-tag">
+                            ${service.pretServiciu || 0} RON
+                            ${service.durataServiciu ? ` • ${service.durataServiciu} min` : ''}
+                        </div>
+                        <p class="text-muted mb-3">${service.descriereServiciu || 'Fără descriere disponibilă.'}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-phone me-1"></i>
+                                ${service.contact || 'Contact necunoscut'}
+                            </small>
+                            <button class="btn btn-primary btn-sm" onclick="scrollToAppointment('${service.numeServiciu || ''}')">
+                                <i class="fas fa-calendar-plus me-1"></i>Programează
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function showNoServices() {
+        const container = document.getElementById('servicesContainer');
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="no-services">
+                    <i class="fas fa-spa"></i>
+                    <h3 class="mb-3">Momentan nu avem servicii disponibile</h3>
+                    <p class="text-muted mb-4">Vă rugăm să reveniți mai târziu sau să ne contactați direct pentru mai multe informații.</p>
+                    <a href="#contact" class="btn btn-primary btn-lg">
+                        <i class="fas fa-phone me-2"></i>Contactează-ne
+                    </a>
+                </div>
+            </div>
+        `;
+    }
+
+    function populateServiceDropdown(services) {
+        const dropdown = document.getElementById('service');
+        dropdown.innerHTML = '<option value="">Selectează serviciul</option>';
+
+        if (services && services.length > 0) {
+            services.forEach(service => {
+                const option = document.createElement('option');
+                option.value = service.numeServiciu;
+                option.textContent = `${service.numeServiciu} - ${service.pretServiciu} RON`;
+                dropdown.appendChild(option);
+            });
+        }
+    }
+
+    function setupForm() {
+    const form = document.getElementById('appointmentForm');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = {
+            clientName: document.getElementById('name').value,
+            clientPhone: document.getElementById('phone').value,
+            serviceName: document.getElementById('service').value,
+            date: document.getElementById('date').value,
+            message: document.getElementById('message').value,
+            status: 'PENDING', // Always set to PENDING for new appointments
+            createdAt: new Date().toISOString()
+        };
+
+        // Basic validation
+        if (!formData.clientName || !formData.clientPhone || !formData.serviceName) {
+            alert('Vă rugăm să completați toate câmpurile obligatorii!');
+            return;
+        }
+
+        // Send appointment to backend/API
+        saveAppointmentToAdmin(formData);
+    });
+}
+
+function saveAppointmentToAdmin(appointmentData) {
+    // Get current appointments from localStorage or initialize empty array
+    const STORAGE_KEY = 'kineto_appointments';
+    let appointments = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+    // Generate a unique ID for the new appointment
+    const nextId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id)) + 1 : 1;
+
+    // Create the appointment object
+    const newAppointment = {
+        id: nextId,
+        clientName: appointmentData.clientName,
+        clientPhone: appointmentData.clientPhone,
+        serviceName: appointmentData.serviceName,
+        // You might want to get the actual service price and duration here
+        servicePrice: 0, // This should be populated based on selected service
+        duration: 0, // This should be populated based on selected service
+        date: appointmentData.date || new Date().toISOString().split('T')[0],
+        time: '09:00', // Default time or get from form
+        status: 'PENDING',
+        notes: appointmentData.message || '',
+        createdAt: new Date().toISOString()
+    };
+
+    // Add to appointments array
+    appointments.push(newAppointment);
+
+    // Save back to localStorage
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
+
+    // Show success message
+    showAppointmentSuccess(appointmentData);
+
+    // Reset form
+    document.getElementById('appointmentForm').reset();
+}
+
+    function showAppointmentSuccess(data) {
+        // Create a success message
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-success alert-dismissible fade show mt-3';
+        alert.innerHTML = `
+            <i class="fas fa-check-circle me-2"></i>
+            <strong>Mulțumim pentru programare, ${data.name}!</strong> Vă vom contacta în cel mai scurt timp la numărul ${data.phone} pentru confirmare.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+
+        // Insert after the form
+        const form = document.getElementById('appointmentForm');
+        form.parentNode.insertBefore(alert, form.nextSibling);
+
+        // Auto-remove after 10 seconds
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.remove();
+            }
+        }, 10000);
+    }
+
+    function scrollToAppointment(serviceName) {
+        // Scroll to appointment section
+        document.getElementById('programare').scrollIntoView({
+            behavior: 'smooth'
+        });
+
+        // Pre-select the service in dropdown
+        if (serviceName) {
+            setTimeout(() => {
+                const dropdown = document.getElementById('service');
+                for (let i = 0; i < dropdown.options.length; i++) {
+                    if (dropdown.options[i].value === serviceName) {
+                        dropdown.selectedIndex = i;
+                        break;
+                    }
+                }
+            }, 500);
+        }
+    }
+
+    function setupSmoothScroll() {
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    }
+
+    // Navbar background on scroll
+    window.addEventListener('scroll', function() {
+        const navbar = document.querySelector('.navbar');
+        if (window.scrollY > 100) {
+            navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+            navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
+        } else {
+            navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+            navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
+        }
+    });
+</script>
+</body>
+</html>

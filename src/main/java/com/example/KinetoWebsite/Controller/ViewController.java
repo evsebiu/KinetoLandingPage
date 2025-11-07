@@ -25,4 +25,12 @@ public class ViewController {
     public String login() {
         return "AdminLogin"; // Looks for AdminLogin.html
     }
+    @GetMapping("/admin/appointments")
+    public String appointmentsManagement() {
+        return "AppointmentsManagement"; // Looks for ProgramariManagement.html
+    }
+    @GetMapping("/public")
+    public String publicPage(){
+        return "PublicPage";
+    }
 }

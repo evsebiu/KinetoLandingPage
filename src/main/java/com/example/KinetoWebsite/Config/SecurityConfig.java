@@ -22,6 +22,10 @@ public class SecurityConfig {
                                 "/",
                                 "/error",
                                 "/favicon.ico",
+                                "/login",
+                                "/public", // ← ADD THIS LINE
+                                "/css/**",
+                                "/js/**",
 
                                 // Swagger UI and API docs
                                 "/swagger-ui.html",
@@ -37,20 +41,21 @@ public class SecurityConfig {
                                 "/api/public/**"
                         ).permitAll()
 
-                        // FIXED: Use /** to match all admin endpoints
+                        // Protect admin pages
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
+                        .defaultSuccessUrl("/admin/dashboard", true)
                         .permitAll()
                 )
                 .logout(logout -> logout
+                        .logoutSuccessUrl("/login?logout")
                         .permitAll()
                 )
-                // ADD THIS: Disable CSRF for API testing
                 .csrf(csrf -> csrf.disable())
-                // ADD THIS: Enable HTTP Basic Auth for Postman
                 .httpBasic(httpBasic -> {});
 
         return http.build();
