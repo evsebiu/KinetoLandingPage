@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ro" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionare Servicii - Kineto Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        .service-card {
+            transition: transform 0.2s;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .service-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar (same as dashboard) -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <div class="text-center mb-4">
+                    <h4 class="text-white">Kineto Admin</h4>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/dashboard}">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/api/admin/services}">
+                            <i class="fas fa-spa me-2"></i>
+                            Servicii
+                        </a>
+                    </li>
+                    <!-- Other menu items same as dashboard -->
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Gestionare Servicii</h1>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+                    <i class="fas fa-plus me-1"></i>Adaugă Serviciu
+                </button>
+            </div>
+
+            <!-- Services Grid -->
+            <div class="row" id="servicesContainer">
+                <!-- Services will be loaded here via JavaScript -->
+                <div class="col-12 text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Se încarcă...</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Add Service Modal -->
+<div class="modal fade" id="addServiceModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Adaugă Serviciu Nou</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addServiceForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="numeServiciu" class="form-label">Nume Serviciu *</label>
+                            <input type="text" class="form-control" id="numeServiciu" name="numeServiciu" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="pretServiciu" class="form-label">Preț (RON) *</label>
+                            <input type="number" class="form-control" id="pretServiciu" name="pretServiciu" min="0" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="durataServiciu" class="form-label">Durată (minute) *</label>
+                            <input type="number" class="form-control" id="durataServiciu" name="durataServiciu" min="1" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="contact" class="form-label">Contact *</label>
+                            <input type="tel" class="form-control" id="contact" name="contact" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descriereServiciu" class="form-label">Descriere</label>
+                        <textarea class="form-control" id="descriereServiciu" name="descriereServiciu" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+                <button type="button" class="btn btn-primary" onclick="addService()">Salvează Serviciu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Service Modal -->
+<div class="modal fade" id="editServiceModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modifică Serviciu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editServiceForm">
+                    <input type="hidden" id="editServiceId">
+                    <!-- Same form fields as add service -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+                <button type="button" class="btn btn-primary" onclick="updateService()">Actualizează</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Load services when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadServices();
+    });
+
+    function loadServices() {
+        fetch('/api/admin/services')
+            .then(response => response.json())
+            .then(services => {
+                const container = document.getElementById('servicesContainer');
+                container.innerHTML = '';
+
+                services.forEach(service => {
+                    const serviceCard = `
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card service-card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">${service.numeServiciu}</h5>
+                                    <p class="card-text text-muted">${service.descriereServiciu}</p>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="badge bg-primary">${service.pretServiciu} RON</span>
+                                        <span class="badge bg-secondary">${service.durataServiciu} min</span>
+                                    </div>
+                                    <p class="card-text"><small class="text-muted">Contact: ${service.contact}</small></p>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editService(${service.id})">
+                                        <i class="fas fa-edit"></i> Modifică
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteService(${service.id})">
+                                        <i class="fas fa-trash"></i> Șterge
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += serviceCard;
+                });
+            })
+            .catch(error => {
+                console.error('Error loading services:', error);
+                document.getElementById('servicesContainer').innerHTML =
+                    '<div class="col-12 text-center text-danger">Eroare la încărcarea serviciilor</div>';
+            });
+    }
+
+    function addService() {
+        const formData = {
+            numeServiciu: document.getElementById('numeServiciu').value,
+            descriereServiciu: document.getElementById('descriereServiciu').value,
+            pretServiciu: parseInt(document.getElementById('pretServiciu').value),
+            durataServiciu: parseInt(document.getElementById('durataServiciu').value),
+            contact: document.getElementById('contact').value
+        };
+
+        fetch('/api/admin/services', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            if (response.ok) {
+                $('#addServiceModal').modal('hide');
+                document.getElementById('addServiceForm').reset();
+                loadServices();
+            }
+        })
+        .catch(error => console.error('Error adding service:', error));
+    }
+
+    function editService(serviceId) {
+        // Implementation for edit
+    }
+
+    function deleteService(serviceId) {
+        if (confirm('Sigur doriți să ștergeți acest serviciu?')) {
+            fetch(`/api/admin/services/${serviceId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    loadServices();
+                }
+            })
+            .catch(error => console.error('Error deleting service:', error));
+        }
+    }
+</script>
+</body>
+</html>
