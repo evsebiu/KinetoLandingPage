@@ -1,4 +1,4 @@
-package com.example.KinetoWebsite.UnitTestingController;
+package com.example.KinetoWebsite.UnitTests.UnitTestingController;
 
 import com.example.KinetoWebsite.Controller.PublicController;
 import com.example.KinetoWebsite.Model.DTO.ServiceDetailsDTO;

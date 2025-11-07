@@ -1,4 +1,4 @@
-package com.example.KinetoWebsite.UnitTestingService;
+package com.example.KinetoWebsite.UnitTests.UnitTestingService;
 
 import com.example.KinetoWebsite.Exceptions.DuplicateResourceException;
 import com.example.KinetoWebsite.Exceptions.IllegalArgumentException;
