@@ -553,22 +553,22 @@
     });
 
     function loadServices() {
-        fetch('/api/public/services')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(services => {
-                displayServices(services);
-                populateServiceDropdown(services);
-            })
-            .catch(error => {
-                console.error('Error loading services:', error);
-                showNoServices();
-            });
-    }
+    fetch('/api/public/services')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(services => {
+            displayServices(services);
+            populateServiceDropdown(services);
+        })
+        .catch(error => {
+            console.error('Error loading services:', error);
+            showNoServices();
+        });
+}
 
     function displayServices(services) {
         const container = document.getElementById('servicesContainer');
@@ -636,83 +636,110 @@
     }
 
     function setupForm() {
-    const form = document.getElementById('appointmentForm');
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
+        const form = document.getElementById('appointmentForm');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
 
-        const formData = {
-            clientName: document.getElementById('name').value,
-            clientPhone: document.getElementById('phone').value,
-            serviceName: document.getElementById('service').value,
-            date: document.getElementById('date').value,
-            message: document.getElementById('message').value,
-            status: 'PENDING', // Always set to PENDING for new appointments
+            const formData = {
+                clientName: document.getElementById('name').value,
+                clientPhone: document.getElementById('phone').value,
+                serviceName: document.getElementById('service').value,
+                date: document.getElementById('date').value,
+                message: document.getElementById('message').value
+            };
+
+            // Basic validation
+            if (!formData.clientName || !formData.clientPhone || !formData.serviceName) {
+                alert('Vă rugăm să completați toate câmpurile obligatorii!');
+                return;
+            }
+
+            // Send appointment to backend API
+            saveAppointmentToBackend(formData);
+        });
+    }
+
+    function saveAppointmentToBackend(appointmentData) {
+        // Convert to DTO format expected by backend
+        const appointmentDTO = {
+            patientName: appointmentData.clientName,
+            phoneNumber: appointmentData.clientPhone,
+            date: appointmentData.date || new Date().toISOString().split('T')[0],
+            additionalInfo: `Serviciu: ${appointmentData.serviceName}. ${appointmentData.message || 'Niciun mesaj adițional'}`
+        };
+
+        // Send to your Spring Boot backend
+        fetch('/api/appointments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(appointmentDTO)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            showAppointmentSuccess(appointmentData);
+            document.getElementById('appointmentForm').reset();
+
+            // Also save to localStorage for admin dashboard (temporary solution)
+            saveToLocalStorage(appointmentData);
+        })
+        .catch(error => {
+            console.error('Error saving appointment:', error);
+            // Fallback to localStorage if backend is not available
+            saveToLocalStorage(appointmentData);
+            showAppointmentSuccess(appointmentData);
+            document.getElementById('appointmentForm').reset();
+        });
+    }
+
+    function saveToLocalStorage(appointmentData) {
+        const STORAGE_KEY = 'kineto_appointments';
+        let appointments = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+        const newAppointment = {
+            id: appointments.length > 0 ? Math.max(...appointments.map(a => a.id)) + 1 : 1,
+            clientName: appointmentData.clientName,
+            clientPhone: appointmentData.clientPhone,
+            serviceName: appointmentData.serviceName,
+            servicePrice: getServicePrice(appointmentData.serviceName),
+            date: appointmentData.date || new Date().toISOString().split('T')[0],
+            time: '09:00',
+            status: 'PENDING',
+            notes: appointmentData.message || '',
             createdAt: new Date().toISOString()
         };
 
-        // Basic validation
-        if (!formData.clientName || !formData.clientPhone || !formData.serviceName) {
-            alert('Vă rugăm să completați toate câmpurile obligatorii!');
-            return;
-        }
+        appointments.push(newAppointment);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
+    }
 
-        // Send appointment to backend/API
-        saveAppointmentToAdmin(formData);
-    });
-}
-
-function saveAppointmentToAdmin(appointmentData) {
-    // Get current appointments from localStorage or initialize empty array
-    const STORAGE_KEY = 'kineto_appointments';
-    let appointments = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-
-    // Generate a unique ID for the new appointment
-    const nextId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id)) + 1 : 1;
-
-    // Create the appointment object
-    const newAppointment = {
-        id: nextId,
-        clientName: appointmentData.clientName,
-        clientPhone: appointmentData.clientPhone,
-        serviceName: appointmentData.serviceName,
-        // You might want to get the actual service price and duration here
-        servicePrice: 0, // This should be populated based on selected service
-        duration: 0, // This should be populated based on selected service
-        date: appointmentData.date || new Date().toISOString().split('T')[0],
-        time: '09:00', // Default time or get from form
-        status: 'PENDING',
-        notes: appointmentData.message || '',
-        createdAt: new Date().toISOString()
-    };
-
-    // Add to appointments array
-    appointments.push(newAppointment);
-
-    // Save back to localStorage
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
-
-    // Show success message
-    showAppointmentSuccess(appointmentData);
-
-    // Reset form
-    document.getElementById('appointmentForm').reset();
-}
+    function getServicePrice(serviceName) {
+        const prices = {
+            'Masaj Terapeutic': 150,
+            'Fizioterapie': 120,
+            'Kinetoterapie': 130
+        };
+        return prices[serviceName] || 0;
+    }
 
     function showAppointmentSuccess(data) {
-        // Create a success message
         const alert = document.createElement('div');
         alert.className = 'alert alert-success alert-dismissible fade show mt-3';
         alert.innerHTML = `
             <i class="fas fa-check-circle me-2"></i>
-            <strong>Mulțumim pentru programare, ${data.name}!</strong> Vă vom contacta în cel mai scurt timp la numărul ${data.phone} pentru confirmare.
+            <strong>Mulțumim pentru programare, ${data.clientName}!</strong> Vă vom contacta în cel mai scurt timp la numărul ${data.clientPhone} pentru confirmare.
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
 
-        // Insert after the form
         const form = document.getElementById('appointmentForm');
         form.parentNode.insertBefore(alert, form.nextSibling);
 
-        // Auto-remove after 10 seconds
         setTimeout(() => {
             if (alert.parentNode) {
                 alert.remove();
@@ -721,12 +748,10 @@ function saveAppointmentToAdmin(appointmentData) {
     }
 
     function scrollToAppointment(serviceName) {
-        // Scroll to appointment section
         document.getElementById('programare').scrollIntoView({
             behavior: 'smooth'
         });
 
-        // Pre-select the service in dropdown
         if (serviceName) {
             setTimeout(() => {
                 const dropdown = document.getElementById('service');
@@ -741,7 +766,6 @@ function saveAppointmentToAdmin(appointmentData) {
     }
 
     function setupSmoothScroll() {
-        // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();

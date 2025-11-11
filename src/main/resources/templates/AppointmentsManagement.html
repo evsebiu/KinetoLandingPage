@@ -431,6 +431,35 @@
         loadAppointments();
         setDefaultDate();
     });
+    function loadAppointmentsFromBackend() {
+    fetch('/api/appointments')
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Backend not available');
+        })
+        .then(appointments => {
+            allAppointments = appointments.map(app => ({
+                id: app.id,
+                clientName: app.patientName,
+                clientPhone: app.phoneNumber,
+                serviceName: extractServiceFromInfo(app.additionalInfo),
+                servicePrice: getServicePrice(extractServiceFromInfo(app.additionalInfo)),
+                date: app.date,
+                time: '09:00',
+                status: 'PENDING',
+                notes: app.additionalInfo,
+                createdAt: new Date().toISOString()
+            }));
+            updateStatistics(allAppointments);
+            displayAppointments(allAppointments);
+        })
+        .catch(error => {
+            console.log('Backend not available, using localStorage:', error);
+            loadAppointmentsFromLocalStorage();
+        });
+}
 
     function initializeData() {
         // Load appointments from localStorage or initialize empty array

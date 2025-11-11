@@ -13,6 +13,7 @@ public class AppointmentMapper {
         }
 
         AppointmentDTO dto = new AppointmentDTO();
+        dto.setId(entity.getId());
         dto.setPhoneNumber(entity.getPhoneNumber());
         dto.setPatientName(entity.getPatientName());
         dto.setAdditionalInfo(entity.getAdditionalInfo());
@@ -25,6 +26,7 @@ public class AppointmentMapper {
             return null;
         }
         Appointment entity = new Appointment();
+        entity.setId(dto.getId());
         entity.setPhoneNumber(dto.getPhoneNumber());
         entity.setPatientName(dto.getPatientName());
         entity.setAdditionalInfo(dto.getAdditionalInfo());

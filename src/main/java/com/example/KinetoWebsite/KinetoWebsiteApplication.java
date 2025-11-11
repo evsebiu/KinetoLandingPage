@@ -7,9 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @OpenAPIDefinition(
         info = @Info(
-                title = "Community Health Medical System API",
+                title = "Kineto Landing Page API",
                 version = "1.0",
-                description = "API for Community Health Medical System"
+                description = "API for a Kineto massage booking website."
         )
 )
 

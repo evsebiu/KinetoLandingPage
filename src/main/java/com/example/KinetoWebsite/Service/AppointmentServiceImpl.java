@@ -4,10 +4,14 @@ import com.example.KinetoWebsite.Model.DTO.AppointmentDTO;
 import com.example.KinetoWebsite.Model.Entity.Appointment;
 import com.example.KinetoWebsite.Model.Mapper.AppointmentMapper;
 import com.example.KinetoWebsite.Repository.AppointmentRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+
+@Service
 
 public class AppointmentServiceImpl implements AppointmentService{
 

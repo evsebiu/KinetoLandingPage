@@ -207,5 +207,81 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let allAppointments = [];
+    let allServices = [];
+    let currentFilter = 'all';
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', function() {
+        loadAppointmentsFromBackend();
+        loadServicesForDropdown();
+        setDefaultDate();
+    });
+
+    function loadAppointmentsFromBackend() {
+        // Try to load from backend first
+        fetch('/api/appointments')
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Backend not available');
+            })
+            .then(appointments => {
+                allAppointments = appointments.map(app => ({
+                    id: app.id,
+                    clientName: app.patientName,
+                    clientPhone: app.phoneNumber,
+                    serviceName: extractServiceFromInfo(app.additionalInfo),
+                    servicePrice: getServicePrice(extractServiceFromInfo(app.additionalInfo)),
+                    date: app.date,
+                    time: '09:00', // Default time
+                    status: 'PENDING', // Default status
+                    notes: app.additionalInfo,
+                    createdAt: new Date().toISOString()
+                }));
+                updateStatistics(allAppointments);
+                displayAppointments(allAppointments);
+            })
+            .catch(error => {
+                console.log('Backend not available, using localStorage:', error);
+                // Fallback to localStorage
+                loadAppointmentsFromLocalStorage();
+            });
+    }
+
+    function loadAppointmentsFromLocalStorage() {
+        const STORAGE_KEY = 'kineto_appointments';
+        const storedAppointments = localStorage.getItem(STORAGE_KEY);
+        if (storedAppointments) {
+            allAppointments = JSON.parse(storedAppointments);
+            updateStatistics(allAppointments);
+            displayAppointments(allAppointments);
+        } else {
+            allAppointments = [];
+            displayAppointments([]);
+        }
+    }
+
+    function extractServiceFromInfo(additionalInfo) {
+        if (additionalInfo && additionalInfo.includes('Serviciu:')) {
+            return additionalInfo.split('Serviciu:')[1].split('.')[0].trim();
+        }
+        return 'Serviciu general';
+    }
+
+    function getServicePrice(serviceName) {
+        const prices = {
+            'Masaj Terapeutic': 150,
+            'Fizioterapie': 120,
+            'Kinetoterapie': 130
+        };
+        return prices[serviceName] || 0;
+    }
+
+    // ... rest of your existing admin dashboard JavaScript functions remain the same
+    // (showAlert, updateStatistics, displayAppointments, filterAppointments, etc.)
+</script>
 </body>
 </html>
