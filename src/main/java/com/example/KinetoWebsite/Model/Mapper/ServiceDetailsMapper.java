@@ -1,7 +1,9 @@
 package com.example.KinetoWebsite.Model.Mapper;
 
 
+import com.example.KinetoWebsite.Model.DTO.AppointmentDTO;
 import com.example.KinetoWebsite.Model.DTO.ServiceDetailsDTO;
+import com.example.KinetoWebsite.Model.Entity.Appointment;
 import com.example.KinetoWebsite.Model.Entity.ServiceDetails;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +38,4 @@ public class ServiceDetailsMapper {
         entity.setContact(dto.getContact());
         return entity;
     }
-
-
 }
