@@ -7,31 +7,36 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AppointmentMapper {
-    public AppointmentDTO toDTO (Appointment entity){
-        if (entity==null){
-            return null;
-        }
+
+    public AppointmentDTO toDTO(Appointment appointment) {
+        if (appointment == null) return null;
 
         AppointmentDTO dto = new AppointmentDTO();
-        dto.setId(entity.getId());
-        dto.setPhoneNumber(entity.getPhoneNumber());
-        dto.setPatientName(entity.getPatientName());
-        dto.setAdditionalInfo(entity.getAdditionalInfo());
-        dto.setDate(entity.getDate());
+        dto.setId(appointment.getId());
+        dto.setPatientName(appointment.getPatientName());
+        dto.setPhoneNumber(appointment.getPhoneNumber());
+        dto.setDate(appointment.getDate());
+        dto.setAdditionalInfo(appointment.getAdditionalInfo());
+        dto.setServiceName(appointment.getServiceName());
+        dto.setTime(appointment.getTime());
+        dto.setStatus(appointment.getStatus());
+
         return dto;
     }
 
-    public Appointment toEntity(AppointmentDTO dto){
-        if (dto==null){
-            return null;
-        }
-        Appointment entity = new Appointment();
-        entity.setId(dto.getId());
-        entity.setPhoneNumber(dto.getPhoneNumber());
-        entity.setPatientName(dto.getPatientName());
-        entity.setAdditionalInfo(dto.getAdditionalInfo());
-        entity.setDate(dto.getDate());
-        return entity;
-    }
+    public Appointment toEntity(AppointmentDTO dto) {
+        if (dto == null) return null;
 
+        Appointment appointment = new Appointment();
+        appointment.setId(dto.getId());
+        appointment.setPatientName(dto.getPatientName());
+        appointment.setPhoneNumber(dto.getPhoneNumber());
+        appointment.setDate(dto.getDate());
+        appointment.setAdditionalInfo(dto.getAdditionalInfo());
+        appointment.setServiceName(dto.getServiceName());
+        appointment.setTime(dto.getTime());
+        appointment.setStatus(dto.getStatus() != null ? dto.getStatus() : "NOU");
+
+        return appointment;
+    }
 }

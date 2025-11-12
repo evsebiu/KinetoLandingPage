@@ -33,4 +33,9 @@ public class AppointmentDTO {
 
     private String additionalInfo;
 
+    private String serviceName;
+    private String time;
+    private String status = "NOU";
+    
+
 }

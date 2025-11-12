@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kineto - Admin Dashboard</title>
+    <title th:text="${pageTitle}">Kineto - Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -25,178 +25,115 @@
         }
         .stat-card {
             border-radius: 10px;
-            transition: transform 0.3s;
+            transition: transform 0.2s;
         }
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
+        .card-stat { border-radius:10px; }
+        .table-actions { white-space:nowrap; }
+        .loading-spinner { display:flex; justify-content:center; align-items:center; padding:2rem; }
     </style>
 </head>
 <body>
+
+<!-- THE MISSING THYMELEAF FRAGMENT IS ADDED HERE -->
+<nav th:fragment="sidebar(activePage)" class="col-md-3 col-lg-2 d-md-block sidebar p-0 shadow-lg">
+    <div class="position-sticky pt-3">
+        <h4 class="text-white text-center mb-4 p-3 border-bottom">Kineto Admin</h4>
+        <ul class="nav flex-column px-3">
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${activePage == 'dashboard'} ? 'active' : ''"
+                   href="/admin/dashboard">
+                    <i class="fas fa-home me-2"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${activePage == 'appointments'} ? 'active' : ''"
+                   href="/admin/appointments">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Programări
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${activePage == 'services'} ? 'active' : ''"
+                   href="/admin/services">
+                    <i class="fas fa-hand-holding-medical me-2"></i>
+                    Servicii
+                </a>
+            </li>
+        </ul>
+        <div class="p-3 mt-5 border-top">
+            <a class="btn btn-outline-light w-100" href="/logout">
+                <i class="fas fa-sign-out-alt me-2"></i>
+                Deconectare
+            </a>
+        </div>
+    </div>
+</nav>
+
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-            <div class="position-sticky pt-3">
-                <div class="text-center mb-4">
-                    <h4 class="text-white">Kineto Admin</h4>
-                </div>
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#">
-                            <i class="fas fa-tachometer-alt me-2"></i>
-                            Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin/services}">
-                            <i class="fas fa-spa me-2"></i>
-                            Servicii
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin/appointments}">
-                            <i class="fas fa-users me-2"></i>
-                            Clienți
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin/appointments}">
-                            <i class="fas fa-calendar me-2"></i>
-                            Programări
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-cog me-2"></i>
-                            Setări
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-
-        <!-- Main content -->
+        <!-- The fragment call will go here in other pages, but the content starts here for the dashboard -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <!-- Header -->
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Dashboard Admin</h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user me-2"></i>Administrator
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Profil</a></li>
-                            <li><a class="dropdown-item" href="#">Setări</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Deconectare</a></li>
-                        </ul>
-                    </div>
-                </div>
+                <h1 class="h2">Dashboard</h1>
             </div>
 
-            <!-- Stats Cards -->
-            <div class="row">
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-primary shadow h-100 py-2 stat-card">
+            <!-- Stats Row -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm stat-card text-white bg-primary">
                         <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                        Total Servicii
-                                    </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${totalServices}">12</div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="card-title">Total Servicii</h5>
+                                    <p class="card-text h3" th:text="${totalServices}">5</p>
                                 </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-spa fa-2x text-gray-300"></i>
-                                </div>
+                                <i class="fas fa-list fa-2x"></i>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-success shadow h-100 py-2 stat-card">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm stat-card text-white bg-success">
                         <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                        Programări Azi
-                                    </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">8</div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="card-title">Programări Totale</h5>
+                                    <p class="card-text h3" th:text="${totalAppointments}">150</p>
                                 </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-calendar fa-2x text-gray-300"></i>
-                                </div>
+                                <i class="fas fa-calendar-check fa-2x"></i>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-info shadow h-100 py-2 stat-card">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm stat-card text-white bg-warning">
                         <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                        Clienți Noi
-                                    </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">3</div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="card-title">Programări Noi (Astăzi)</h5>
+                                    <p class="card-text h3" id="todayAppointmentsCount">0</p>
                                 </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-user-plus fa-2x text-gray-300"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-warning shadow h-100 py-2 stat-card">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                        Venit Lunar
-                                    </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">24,500 RON</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-money-bill fa-2x text-gray-300"></i>
-                                </div>
+                                <i class="fas fa-bell fa-2x"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Activity -->
+            <!-- Recent Appointments -->
             <div class="row">
                 <div class="col-12">
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                            <h6 class="m-0 font-weight-bold text-primary">Activitate Recentă</h6>
-                            <a th:href="@{/admin/services}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-plus me-1"></i>Servicii
-                            </a>
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Ultimele Programări</h5>
                         </div>
                         <div class="card-body">
-                            <div class="list-group">
-                                <a href="#" class="list-group-item list-group-item-action">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">Serviciu nou adăugat</h6>
-                                        <small>Acum 3 ore</small>
-                                    </div>
-                                    <p class="mb-1">Masaj Terapeutic a fost adăugat în sistem</p>
-                                </a>
-                                <a href="#" class="list-group-item list-group-item-action">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">Programare confirmată</h6>
-                                        <small>Acum 5 ore</small>
-                                    </div>
-                                    <p class="mb-1">Maria Popescu a confirmat programarea pentru Fizioterapie</p>
-                                </a>
+                            <div class="list-group" id="recentAppointmentsList">
+                                <p class="text-muted text-center py-3">Se încarcă programările...</p>
                             </div>
                         </div>
                     </div>
@@ -207,81 +144,96 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    let allAppointments = [];
-    let allServices = [];
-    let currentFilter = 'all';
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    (function () {
+        const todayAppointmentsCount = document.getElementById('todayAppointmentsCount');
+        const recentAppointmentsList = document.getElementById('recentAppointmentsList');
+        const servicesMap = new Map(); // Global map for service lookup
 
-    // Initialize the application
-    document.addEventListener('DOMContentLoaded', function() {
-        loadAppointmentsFromBackend();
-        loadServicesForDropdown();
-        setDefaultDate();
-    });
-
-    function loadAppointmentsFromBackend() {
-        // Try to load from backend first
-        fetch('/api/appointments')
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error('Backend not available');
-            })
-            .then(appointments => {
-                allAppointments = appointments.map(app => ({
-                    id: app.id,
-                    clientName: app.patientName,
-                    clientPhone: app.phoneNumber,
-                    serviceName: extractServiceFromInfo(app.additionalInfo),
-                    servicePrice: getServicePrice(extractServiceFromInfo(app.additionalInfo)),
-                    date: app.date,
-                    time: '09:00', // Default time
-                    status: 'PENDING', // Default status
-                    notes: app.additionalInfo,
-                    createdAt: new Date().toISOString()
-                }));
-                updateStatistics(allAppointments);
-                displayAppointments(allAppointments);
-            })
-            .catch(error => {
-                console.log('Backend not available, using localStorage:', error);
-                // Fallback to localStorage
-                loadAppointmentsFromLocalStorage();
-            });
-    }
-
-    function loadAppointmentsFromLocalStorage() {
-        const STORAGE_KEY = 'kineto_appointments';
-        const storedAppointments = localStorage.getItem(STORAGE_KEY);
-        if (storedAppointments) {
-            allAppointments = JSON.parse(storedAppointments);
-            updateStatistics(allAppointments);
-            displayAppointments(allAppointments);
-        } else {
-            allAppointments = [];
-            displayAppointments([]);
+        // Function to load services map
+        async function loadServicesMap() {
+            try {
+                const response = await fetch('/api/public/services');
+                if (!response.ok) throw new Error('Failed to fetch services');
+                const services = await response.json();
+                services.forEach(service => {
+                    servicesMap.set(service.numeServiciu, service);
+                });
+            } catch (error) {
+                console.error('Error loading services map:', error);
+            }
         }
-    }
 
-    function extractServiceFromInfo(additionalInfo) {
-        if (additionalInfo && additionalInfo.includes('Serviciu:')) {
-            return additionalInfo.split('Serviciu:')[1].split('.')[0].trim();
+        // Function to load appointments data
+        async function loadAppointments() {
+            try {
+                const response = await fetch('/api/appointments');
+                if (!response.ok) throw new Error('Failed to fetch appointments');
+                const appointments = await response.json();
+
+                // 1. Calculate Today's Appointments
+                const today = new Date().toISOString().split('T')[0];
+                const todayCount = appointments.filter(a => a.appointmentDate === today).length;
+                todayAppointmentsCount.textContent = todayCount;
+
+                // 2. Display Recent Appointments (Last 5, sorted by creation date descending)
+                const recentAppointments = appointments
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    .slice(0, 5);
+
+                renderRecentAppointments(recentAppointments);
+
+            } catch (error) {
+                console.error('Error loading appointments:', error);
+                recentAppointmentsList.innerHTML = '<p class="text-danger text-center py-3">Eroare la încărcarea programărilor.</p>';
+            }
         }
-        return 'Serviciu general';
-    }
 
-    function getServicePrice(serviceName) {
-        const prices = {
-            'Masaj Terapeutic': 150,
-            'Fizioterapie': 120,
-            'Kinetoterapie': 130
-        };
-        return prices[serviceName] || 0;
-    }
+        // Helper to render the recent appointments list
+        function renderRecentAppointments(recentAppointments) {
+            if (recentAppointments.length === 0) {
+                recentAppointmentsList.innerHTML = '<p class="text-muted text-center py-3">Nu există programări recente.</p>';
+                return;
+            }
 
-    // ... rest of your existing admin dashboard JavaScript functions remain the same
-    // (showAlert, updateStatistics, displayAppointments, filterAppointments, etc.)
+            recentAppointmentsList.innerHTML = recentAppointments.map(appointment => {
+                const service = servicesMap.get(appointment.serviceName) || { numeServiciu: appointment.serviceName };
+                const timeAgo = getTimeAgo(appointment.createdAt);
+                return `
+                    <a href="/admin/appointments" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Programare nouă</h6>
+                            <small>${timeAgo}</small>
+                        </div>
+                        <p class="mb-1">${appointment.clientName} a făcut o programare pentru ${service.numeServiciu}</p>
+                    </a>
+                `;
+            }).join('');
+        }
+
+        function getTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Acum câteva secunde';
+            if (diffMins < 60) return `Acum ${diffMins} minute`;
+            if (diffHours < 24) return `Acum ${diffHours} ore`;
+            if (diffDays === 1) return 'Acum 1 zi';
+            return `Acum ${diffDays} zile`;
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', async function () {
+            await loadServicesMap();
+            await loadAppointments();
+        });
+    })();
+    /*]]>*/
 </script>
 </body>
 </html>

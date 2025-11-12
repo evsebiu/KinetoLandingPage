@@ -1,271 +1,84 @@
 <!DOCTYPE html>
 <html lang="ro" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestionare Programări - Kineto Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title th:text="${pageTitle} ?: 'Gestionare Programări - Kineto Admin'">Gestionare Programări - Kineto Admin</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+
     <style>
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --danger-color: #dc3545;
         }
-        .sidebar .nav-link {
-            color: #fff;
-            padding: 15px 20px;
-            border-radius: 5px;
-            margin: 5px 0;
-        }
-        .sidebar .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        .sidebar .nav-link.active {
-            background: rgba(255,255,255,0.2);
-        }
-        .appointment-card {
-            transition: transform 0.2s;
-            border: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border-left: 4px solid #667eea;
-        }
-        .appointment-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        .status-confirmed {
-            border-left-color: #28a745;
-        }
-        .status-pending {
-            border-left-color: #ffc107;
-        }
-        .status-cancelled {
-            border-left-color: #dc3545;
-        }
-        .status-completed {
-            border-left-color: #17a2b8;
-        }
-        .badge-status {
-            font-size: 0.75em;
-        }
-        .filter-buttons .btn {
-            margin: 2px;
-        }
-        .card-stat {
-            border-radius: 10px;
-            transition: transform 0.3s;
-        }
-        .card-stat:hover {
-            transform: translateY(-5px);
-        }
-        .table-actions {
-            white-space: nowrap;
-        }
-        .form-control:focus, .form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-        .btn-primary {
-            background-color: #667eea;
-            border-color: #667eea;
-        }
-        .btn-primary:hover {
-            background-color: #5a6fd8;
-            border-color: #5a6fd8;
-        }
+        .sidebar { min-height:100vh; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); }
+        .sidebar .nav-link { color:#fff; padding:12px 16px; border-radius:6px; display:block; transition: background-color 0.2s; }
+        .sidebar .nav-link:hover { background: rgba(255,255,255,0.15); }
+        .sidebar .nav-link.active { background:rgba(255,255,255,0.25); font-weight: 600; }
+        .table-actions { white-space:nowrap; }
+        .loading-spinner { display:flex; justify-content:center; align-items:center; padding:2rem; }
+        .status-badge { font-weight: 500; }
+        .btn-quick-status { padding: .25rem .5rem; font-size: .875rem; }
+        .alert-container { position: fixed; top: 1rem; right: 1rem; z-index: 2000; width: 300px; }
+        .modal-header { background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); color: white; }
     </style>
 </head>
 <body>
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-            <div class="position-sticky pt-3">
-                <div class="text-center mb-4">
-                    <h4 class="text-white">Kineto Admin</h4>
-                </div>
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin/dashboard}">
-                            <i class="fas fa-tachometer-alt me-2"></i>
-                            Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin/services}">
-                            <i class="fas fa-spa me-2"></i>
-                            Servicii
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-users me-2"></i>
-                            Clienți
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" th:href="@{/admin/appointments}">
-                            <i class="fas fa-calendar me-2"></i>
-                            Programări
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-cog me-2"></i>
-                            Setări
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+        <nav th:replace="~{AdminDashboard :: sidebar('appointments')}"></nav>
 
-        <!-- Main content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <!-- Header -->
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Gestionare Programări</h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user me-2"></i>Administrator
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Profil</a></li>
-                            <li><a class="dropdown-item" href="#">Setări</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form th:action="@{/logout}" method="post" style="display: inline;">
-                                    <button type="submit" class="dropdown-item">Deconectare</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 p-4">
+            <h1 class="h2 mb-4 text-primary"><i class="fas fa-calendar-check me-2"></i>Gestionare Programări</h1>
 
-            <!-- Filters and Add Button -->
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
-                <div>
-                    <h3 class="h4">Lista Programări</h3>
-                    <div class="filter-buttons mt-2">
-                        <button class="btn btn-outline-primary btn-sm active" onclick="filterAppointments('all')">
-                            Toate
-                        </button>
-                        <button class="btn btn-outline-success btn-sm" onclick="filterAppointments('confirmed')">
-                            Confirmate
-                        </button>
-                        <button class="btn btn-outline-warning btn-sm" onclick="filterAppointments('pending')">
-                            În așteptare
-                        </button>
-                        <button class="btn btn-outline-danger btn-sm" onclick="filterAppointments('cancelled')">
-                            Anulate
-                        </button>
-                        <button class="btn btn-outline-info btn-sm" onclick="filterAppointments('completed')">
-                            Finalizate
-                        </button>
-                    </div>
-                </div>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">
-                    <i class="fas fa-plus me-1"></i>Programare Nouă
-                </button>
-            </div>
+            <!-- Alert Container for notifications -->
+            <div id="alertContainer" class="alert-container"></div>
 
-            <!-- Statistics Cards -->
-            <div class="row mb-4">
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-primary shadow h-100 py-2 card-stat">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                        Programări Azi
-                                    </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="todayAppointments">0</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-success shadow h-100 py-2 card-stat">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                        Confirmate
-                                    </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="confirmedAppointments">0</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-warning shadow h-100 py-2 card-stat">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                        În Așteptare
-                                    </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="pendingAppointments">0</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-clock fa-2x text-gray-300"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-info shadow h-100 py-2 card-stat">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                        Venit Lunar
-                                    </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="monthlyRevenue">0 RON</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-money-bill fa-2x text-gray-300"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Appointments Table -->
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Toate Programările</h6>
-                </div>
+            <div class="card shadow-sm mb-4">
                 <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                        <div class="d-flex align-items-center flex-grow-1 mb-2 mb-md-0">
+                            <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#newAppointmentModal">
+                                <i class="fas fa-plus me-1"></i> Adaugă Programare Nouă
+                            </button>
+                            <button type="button" class="btn btn-success me-3" onclick="window.app.exportCSV()">
+                                <i class="fas fa-file-csv me-1"></i> Export CSV
+                            </button>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="autoRefreshToggle" checked>
+                            <label class="form-check-label" for="autoRefreshToggle" title="Actualizează automat la fiecare 15 secunde.">Actualizare live</label>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
-                        <table class="table table-bordered" id="appointmentsTable" width="100%" cellspacing="0">
-                            <thead>
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
                             <tr>
-                                <th>Client</th>
+                                <th>ID</th>
+                                <th>Nume</th>
+                                <th>Telefon</th>
                                 <th>Serviciu</th>
-                                <th>Data & Ora</th>
-                                <th>Durată</th>
-                                <th>Preț</th>
+                                <th>Data</th>
+                                <th>Ora</th>
                                 <th>Status</th>
-                                <th>Acțiuni</th>
+                                <th>Detalii</th>
+                                <th class="text-end">Acțiuni</th>
                             </tr>
                             </thead>
-                            <tbody id="appointmentsContainer">
-                            <!-- Appointments will be loaded here -->
+                            <tbody id="appointmentsTableBody">
+                            <!-- Appointment rows will be injected here -->
+                            <tr>
+                                <td colspan="9" class="text-center text-muted p-4" id="loadingRow">
+                                    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+                                    Se încarcă programările...
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -275,546 +88,617 @@
     </div>
 </div>
 
-<!-- Add Appointment Modal -->
-<div class="modal fade" id="addAppointmentModal" tabindex="-1">
+<!-- Modal pentru Adăugare Programare Nouă -->
+<div class="modal fade" id="newAppointmentModal" tabindex="-1" aria-labelledby="newAppointmentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Programare Nouă</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title" id="newAppointmentModalLabel"><i class="fas fa-calendar-plus me-1"></i> Adaugă Programare Nouă</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Închide"></button>
             </div>
             <div class="modal-body">
-                <form id="addAppointmentForm">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="clientName" class="form-label">Nume Client *</label>
-                            <input type="text" class="form-control" id="clientName" name="clientName" required>
-                            <div class="invalid-feedback">Vă rugăm să introduceți numele clientului.</div>
+                <form id="newAppointmentForm">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="appointmentName" class="form-label">Nume Pacient</label>
+                            <input type="text" class="form-control" id="appointmentName" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="clientPhone" class="form-label">Telefon *</label>
-                            <input type="tel" class="form-control" id="clientPhone" name="clientPhone" required>
-                            <div class="invalid-feedback">Vă rugăm să introduceți un număr de telefon valid.</div>
+                        <div class="col-md-6">
+                            <label for="appointmentPhone" class="form-label">Telefon</label>
+                            <input type="tel" class="form-control" id="appointmentPhone" required>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="serviceId" class="form-label">Serviciu *</label>
-                            <select class="form-select" id="serviceId" name="serviceId" required>
-                                <option value="">Selectează serviciu</option>
-                                <!-- Services will be loaded via JavaScript -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="appointmentService" class="form-label">Serviciu</label>
+                            <select class="form-select" id="appointmentService" required>
+                                <option value="" disabled selected>Alege un Serviciu</option>
                             </select>
-                            <div class="invalid-feedback">Vă rugăm să selectați un serviciu.</div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="appointmentDate" class="form-label">Dată *</label>
-                            <input type="date" class="form-control" id="appointmentDate" name="appointmentDate" required>
-                            <div class="invalid-feedback">Vă rugăm să selectați o dată.</div>
+                        <div class="col-md-4">
+                            <label for="appointmentDate" class="form-label">Data</label>
+                            <input type="date" class="form-control" id="appointmentDate" required>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="appointmentTime" class="form-label">Ora *</label>
-                            <input type="time" class="form-control" id="appointmentTime" name="appointmentTime" required>
-                            <div class="invalid-feedback">Vă rugăm să selectați o oră.</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="status" class="form-label">Status</label>
-                            <select class="form-select" id="status" name="status">
-                                <option value="PENDING">În așteptare</option>
-                                <option value="CONFIRMED">Confirmată</option>
-                                <option value="COMPLETED">Finalizată</option>
-                                <option value="CANCELLED">Anulată</option>
-                            </select>
+                        <div class="col-md-4">
+                            <label for="appointmentTime" class="form-label">Ora</label>
+                            <input type="time" class="form-control" id="appointmentTime" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="notes" class="form-label">Note</label>
-                        <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Note adiționale..."></textarea>
+                        <label for="appointmentDetails" class="form-label">Detalii/Note Suplimentare</label>
+                        <textarea class="form-control" id="appointmentDetails" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="appointmentStatus" class="form-label">Status Inițial</label>
+                        <select class="form-select" id="appointmentStatus" required>
+                            <option value="NOU" selected>Nou</option>
+                            <option value="CONFIRMAT">Confirmat</option>
+                            <option value="ANULAT">Anulat</option>
+                            <option value="FINALIZAT">Finalizat</option>
+                        </select>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
-                <button type="button" class="btn btn-primary" onclick="saveAppointment()">Salvează Programare</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Închide</button>
+                <button type="button" class="btn btn-primary" id="saveAppointmentBtn"><i class="fas fa-save me-1"></i> Salvează Programarea</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Edit Appointment Modal -->
-<div class="modal fade" id="editAppointmentModal" tabindex="-1">
+<!-- Modal pentru Editare Programare -->
+<div class="modal fade" id="editAppointmentModal" tabindex="-1" aria-labelledby="editAppointmentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Editare Programare</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title" id="editAppointmentModalLabel"><i class="fas fa-edit me-1"></i> Editează Programare</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Închide"></button>
             </div>
             <div class="modal-body">
                 <form id="editAppointmentForm">
                     <input type="hidden" id="editAppointmentId">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="editClientName" class="form-label">Nume Client *</label>
-                            <input type="text" class="form-control" id="editClientName" name="editClientName" required>
-                            <div class="invalid-feedback">Vă rugăm să introduceți numele clientului.</div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="editAppointmentName" class="form-label">Nume Pacient</label>
+                            <input type="text" class="form-control" id="editAppointmentName" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="editClientPhone" class="form-label">Telefon *</label>
-                            <input type="tel" class="form-control" id="editClientPhone" name="editClientPhone" required>
-                            <div class="invalid-feedback">Vă rugăm să introduceți un număr de telefon valid.</div>
+                        <div class="col-md-6">
+                            <label for="editAppointmentPhone" class="form-label">Telefon</label>
+                            <input type="tel" class="form-control" id="editAppointmentPhone" required>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="editServiceId" class="form-label">Serviciu *</label>
-                            <select class="form-select" id="editServiceId" name="editServiceId" required>
-                                <option value="">Selectează serviciu</option>
-                                <!-- Services will be loaded via JavaScript -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="editAppointmentService" class="form-label">Serviciu</label>
+                            <select class="form-select" id="editAppointmentService" required>
+                                <option value="" disabled selected>Alege un Serviciu</option>
                             </select>
-                            <div class="invalid-feedback">Vă rugăm să selectați un serviciu.</div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="editAppointmentDate" class="form-label">Dată *</label>
-                            <input type="date" class="form-control" id="editAppointmentDate" name="editAppointmentDate" required>
-                            <div class="invalid-feedback">Vă rugăm să selectați o dată.</div>
+                        <div class="col-md-4">
+                            <label for="editAppointmentDate" class="form-label">Data</label>
+                            <input type="date" class="form-control" id="editAppointmentDate" required>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="editAppointmentTime" class="form-label">Ora *</label>
-                            <input type="time" class="form-control" id="editAppointmentTime" name="editAppointmentTime" required>
-                            <div class="invalid-feedback">Vă rugăm să selectați o oră.</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="editStatus" class="form-label">Status</label>
-                            <select class="form-select" id="editStatus" name="editStatus">
-                                <option value="PENDING">În așteptare</option>
-                                <option value="CONFIRMED">Confirmată</option>
-                                <option value="COMPLETED">Finalizată</option>
-                                <option value="CANCELLED">Anulată</option>
-                            </select>
+                        <div class="col-md-4">
+                            <label for="editAppointmentTime" class="form-label">Ora</label>
+                            <input type="time" class="form-control" id="editAppointmentTime" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="editNotes" class="form-label">Note</label>
-                        <textarea class="form-control" id="editNotes" name="editNotes" rows="3" placeholder="Note adiționale..."></textarea>
+                        <label for="editAppointmentDetails" class="form-label">Detalii/Note Suplimentare</label>
+                        <textarea class="form-control" id="editAppointmentDetails" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editAppointmentStatus" class="form-label">Status</label>
+                        <select class="form-select" id="editAppointmentStatus" required>
+                            <option value="NOU">Nou</option>
+                            <option value="CONFIRMAT">Confirmat</option>
+                            <option value="ANULAT">Anulat</option>
+                            <option value="FINALIZAT">Finalizat</option>
+                        </select>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
-                <button type="button" class="btn btn-primary" onclick="updateAppointment()">Actualizează Programare</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Închide</button>
+                <button type="button" class="btn btn-primary" id="updateAppointmentBtn"><i class="fas fa-save me-1"></i> Salvează Modificările</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Success/Error Alerts -->
-<div id="alertContainer" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Data persistence using localStorage
-    const STORAGE_KEY = 'kineto_appointments';
-    const SERVICES_KEY = 'kineto_services';
+    /*[# th:inline="none"]*/
+    (function () {
+        'use strict';
 
-    let allAppointments = [];
-    let allServices = [];
-    let currentFilter = 'all';
-    let nextAppointmentId = 1;
+        let allAppointments = [];
+        let allServices = [];
+        let pollingInterval = null;
+        const POLLING_RATE = 15000; // 15 seconds
+        let lastLoadedCount = 0; // For simple update detection
 
-    // Initialize the application
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeData();
-        loadServicesForDropdown();
-        loadAppointments();
-        setDefaultDate();
-    });
-    function loadAppointmentsFromBackend() {
-    fetch('/api/appointments')
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            }
-            throw new Error('Backend not available');
-        })
-        .then(appointments => {
-            allAppointments = appointments.map(app => ({
-                id: app.id,
-                clientName: app.patientName,
-                clientPhone: app.phoneNumber,
-                serviceName: extractServiceFromInfo(app.additionalInfo),
-                servicePrice: getServicePrice(extractServiceFromInfo(app.additionalInfo)),
-                date: app.date,
-                time: '09:00',
-                status: 'PENDING',
-                notes: app.additionalInfo,
-                createdAt: new Date().toISOString()
-            }));
-            updateStatistics(allAppointments);
-            displayAppointments(allAppointments);
-        })
-        .catch(error => {
-            console.log('Backend not available, using localStorage:', error);
-            loadAppointmentsFromLocalStorage();
-        });
-}
-
-    function initializeData() {
-        // Load appointments from localStorage or initialize empty array
-        const storedAppointments = localStorage.getItem(STORAGE_KEY);
-        if (storedAppointments) {
-            allAppointments = JSON.parse(storedAppointments);
-            // Find the highest ID to set nextAppointmentId
-            if (allAppointments.length > 0) {
-                nextAppointmentId = Math.max(...allAppointments.map(a => a.id)) + 1;
-            }
-        }
-
-        // Initialize services if not already present
-        const storedServices = localStorage.getItem(SERVICES_KEY);
-        if (storedServices) {
-            allServices = JSON.parse(storedServices);
-        } else {
-            // Default services
-            allServices = [
-                { id: 1, numeServiciu: "Masaj Terapeutic", pretServiciu: 150, durata: 60 },
-                { id: 2, numeServiciu: "Fizioterapie", pretServiciu: 120, durata: 45 },
-                { id: 3, numeServiciu: "Reflexologie", pretServiciu: 100, durata: 50 },
-                { id: 4, numeServiciu: "Kinetoterapie", pretServiciu: 130, durata: 60 }
-            ];
-            localStorage.setItem(SERVICES_KEY, JSON.stringify(allServices));
-        }
-    }
-
-    function setDefaultDate() {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('appointmentDate').value = today;
-    }
-
-    function loadServicesForDropdown() {
-        const dropdown = document.getElementById('serviceId');
-        const editDropdown = document.getElementById('editServiceId');
-
-        dropdown.innerHTML = '<option value="">Selectează serviciu</option>';
-        editDropdown.innerHTML = '<option value="">Selectează serviciu</option>';
-
-        allServices.forEach(service => {
-            const option = document.createElement('option');
-            option.value = service.id;
-            option.textContent = `${service.numeServiciu} - ${service.pretServiciu} RON (${service.durata} min)`;
-            dropdown.appendChild(option);
-
-            const editOption = option.cloneNode(true);
-            editDropdown.appendChild(editOption);
-        });
-    }
-
-    function showAlert(message, type) {
+        // DOM elements
+        const tableBody = document.getElementById('appointmentsTableBody');
+        const loadingRow = document.getElementById('loadingRow');
         const alertContainer = document.getElementById('alertContainer');
-        const alert = document.createElement('div');
-        alert.className = `alert alert-${type} alert-dismissible fade show`;
-        alert.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        alertContainer.appendChild(alert);
+        const autoRefreshToggle = document.getElementById('autoRefreshToggle');
 
-        setTimeout(() => {
-            if (alert.parentNode) {
-                alert.remove();
-            }
-        }, 5000);
-    }
-
-    function loadAppointments() {
-        updateStatistics(allAppointments);
-        displayAppointments(allAppointments);
-    }
-
-    function updateStatistics(appointments) {
-        const today = new Date().toISOString().split('T')[0];
-        const todayCount = appointments.filter(a => a.date === today).length;
-        const confirmedCount = appointments.filter(a => a.status === 'CONFIRMED').length;
-        const pendingCount = appointments.filter(a => a.status === 'PENDING').length;
-
-        // Calculate monthly revenue (for current month)
-        const currentMonth = new Date().getMonth();
-        const currentYear = new Date().getFullYear();
-
-        const monthlyRevenue = appointments
-            .filter(a => {
-                const appointmentDate = new Date(a.date);
-                return a.status === 'COMPLETED' &&
-                       appointmentDate.getMonth() === currentMonth &&
-                       appointmentDate.getFullYear() === currentYear;
-            })
-            .reduce((sum, a) => sum + a.servicePrice, 0);
-
-        document.getElementById('todayAppointments').textContent = todayCount;
-        document.getElementById('confirmedAppointments').textContent = confirmedCount;
-        document.getElementById('pendingAppointments').textContent = pendingCount;
-        document.getElementById('monthlyRevenue').textContent = monthlyRevenue + ' RON';
-    }
-
-    function displayAppointments(appointments) {
-        const container = document.getElementById('appointmentsContainer');
-
-        if (appointments.length === 0) {
-            container.innerHTML = `
-                <tr>
-                    <td colspan="7" class="text-center py-4">
-                        <div class="alert alert-info m-0">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Nu există programări.
-                        </div>
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        container.innerHTML = appointments.map(appointment => {
-            const service = allServices.find(s => s.id === appointment.serviceId);
-            return `
-            <tr class="appointment-row" data-status="${appointment.status.toLowerCase()}">
-                <td>
-                    <strong>${appointment.clientName}</strong><br>
-                    <small class="text-muted">${appointment.clientPhone}</small>
-                </td>
-                <td>${service ? service.numeServiciu : 'Serviciu șters'}</td>
-                <td>
-                    <strong>${formatDate(appointment.date)}</strong><br>
-                    <small class="text-muted">${appointment.time}</small>
-                </td>
-                <td>${service ? service.durata : 'N/A'} min</td>
-                <td>${appointment.servicePrice} RON</td>
-                <td>
-                    <span class="badge badge-status ${getStatusClass(appointment.status)}">
-                        ${getStatusText(appointment.status)}
-                    </span>
-                </td>
-                <td class="table-actions">
-                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editAppointment(${appointment.id})" title="Editare">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-success me-1" onclick="confirmAppointment(${appointment.id})" title="Confirmă">
-                        <i class="fas fa-check"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAppointment(${appointment.id})" title="Șterge">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `}).join('');
-    }
-
-    function filterAppointments(filter) {
-        currentFilter = filter;
-
-        // Update active filter button
-        document.querySelectorAll('.filter-buttons .btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        event.target.classList.add('active');
-
-        let filteredAppointments = allAppointments;
-
-        if (filter !== 'all') {
-            filteredAppointments = allAppointments.filter(appointment =>
-                appointment.status.toLowerCase() === filter
-            );
-        }
-
-        displayAppointments(filteredAppointments);
-    }
-
-    function getStatusClass(status) {
-        const classes = {
-            'CONFIRMED': 'bg-success',
-            'PENDING': 'bg-warning',
-            'CANCELLED': 'bg-danger',
-            'COMPLETED': 'bg-info'
-        };
-        return classes[status] || 'bg-secondary';
-    }
-
-    function getStatusText(status) {
-        const texts = {
-            'CONFIRMED': 'Confirmată',
-            'PENDING': 'În așteptare',
-            'CANCELLED': 'Anulată',
-            'COMPLETED': 'Finalizată'
-        };
-        return texts[status] || status;
-    }
-
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('ro-RO', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
-    }
-
-    function saveAppointment() {
-        const form = document.getElementById('addAppointmentForm');
-
-        // Validate form
-        if (!form.checkValidity()) {
-            form.classList.add('was-validated');
-            return;
-        }
-
-        const serviceId = parseInt(document.getElementById('serviceId').value);
-        const selectedService = allServices.find(s => s.id === serviceId);
-
-        if (!selectedService) {
-            showAlert('Serviciul selectat nu a fost găsit!', 'danger');
-            return;
-        }
-
-        const formData = {
-            id: nextAppointmentId++,
-            clientName: document.getElementById('clientName').value,
-            clientPhone: document.getElementById('clientPhone').value,
-            serviceId: serviceId,
-            serviceName: selectedService.numeServiciu,
-            servicePrice: selectedService.pretServiciu,
-            duration: selectedService.durata,
-            appointmentDate: document.getElementById('appointmentDate').value,
-            appointmentTime: document.getElementById('appointmentTime').value,
-            date: document.getElementById('appointmentDate').value,
-            time: document.getElementById('appointmentTime').value,
-            status: document.getElementById('status').value,
-            notes: document.getElementById('notes').value,
-            createdAt: new Date().toISOString()
-        };
-
-        // Add to appointments array
-        allAppointments.push(formData);
-
-        // Save to localStorage
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(allAppointments));
-
-        // Show success message
-        showAlert('Programare adăugată cu succes!', 'success');
-
-        // Close modal and reset form
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addAppointmentModal'));
-        modal.hide();
-        form.reset();
-        form.classList.remove('was-validated');
-        setDefaultDate();
-
-        // Reload appointments
-        loadAppointments();
-    }
-
-    function editAppointment(appointmentId) {
-        const appointment = allAppointments.find(a => a.id === appointmentId);
-
-        if (!appointment) {
-            showAlert('Programarea nu a fost găsită!', 'danger');
-            return;
-        }
-
-        // Populate edit form
-        document.getElementById('editAppointmentId').value = appointment.id;
-        document.getElementById('editClientName').value = appointment.clientName;
-        document.getElementById('editClientPhone').value = appointment.clientPhone;
-        document.getElementById('editServiceId').value = appointment.serviceId;
-        document.getElementById('editAppointmentDate').value = appointment.date;
-        document.getElementById('editAppointmentTime').value = appointment.time;
-        document.getElementById('editStatus').value = appointment.status;
-        document.getElementById('editNotes').value = appointment.notes || '';
-
-        // Show edit modal
+        const newModal = new bootstrap.Modal(document.getElementById('newAppointmentModal'));
         const editModal = new bootstrap.Modal(document.getElementById('editAppointmentModal'));
-        editModal.show();
-    }
 
-    function updateAppointment() {
-        const form = document.getElementById('editAppointmentForm');
+        // --- Utility Functions ---
 
-        // Validate form
-        if (!form.checkValidity()) {
-            form.classList.add('was-validated');
-            return;
+        /**
+         * Custom non-blocking alert/toast notification
+         * @param {string} message - The message to display.
+         * @param {string} type - 'success', 'danger', 'info', or 'warning'.
+         */
+        function showAlert(message, type = 'info') {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show shadow-sm" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            const alertElement = document.createElement('div');
+            alertElement.innerHTML = alertHtml;
+            alertContainer.prepend(alertElement.firstChild);
+
+            // Auto-close after 5 seconds
+            setTimeout(() => {
+                const bsAlert = bootstrap.Alert.getOrCreateInstance(alertElement.firstChild);
+                bsAlert.close();
+            }, 5000);
         }
 
-        const appointmentId = parseInt(document.getElementById('editAppointmentId').value);
-        const serviceId = parseInt(document.getElementById('editServiceId').value);
-        const selectedService = allServices.find(s => s.id === serviceId);
+        /**
+         * Centralized function for API calls.
+         */
+        async function apiCall(url, method = 'GET', data = null) {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
 
-        if (!selectedService) {
-            showAlert('Serviciul selectat nu a fost găsit!', 'danger');
-            return;
-        }
-
-        // Find and update appointment
-        const appointmentIndex = allAppointments.findIndex(a => a.id === appointmentId);
-
-        if (appointmentIndex === -1) {
-            showAlert('Programarea nu a fost găsită!', 'danger');
-            return;
-        }
-
-        allAppointments[appointmentIndex] = {
-            ...allAppointments[appointmentIndex],
-            clientName: document.getElementById('editClientName').value,
-            clientPhone: document.getElementById('editClientPhone').value,
-            serviceId: serviceId,
-            serviceName: selectedService.numeServiciu,
-            servicePrice: selectedService.pretServiciu,
-            duration: selectedService.durata,
-            appointmentDate: document.getElementById('editAppointmentDate').value,
-            appointmentTime: document.getElementById('editAppointmentTime').value,
-            date: document.getElementById('editAppointmentDate').value,
-            time: document.getElementById('editAppointmentTime').value,
-            status: document.getElementById('editStatus').value,
-            notes: document.getElementById('editNotes').value,
-            updatedAt: new Date().toISOString()
-        };
-
-        // Save to localStorage
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(allAppointments));
-
-        // Show success message
-        showAlert('Programare actualizată cu succes!', 'success');
-
-        // Close modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editAppointmentModal'));
-        modal.hide();
-        form.classList.remove('was-validated');
-
-        // Reload appointments
-        loadAppointments();
-    }
-
-    function confirmAppointment(appointmentId) {
-        if (confirm('Sigur doriți să confirmați această programare?')) {
-            const appointmentIndex = allAppointments.findIndex(a => a.id === appointmentId);
-
-            if (appointmentIndex !== -1) {
-                allAppointments[appointmentIndex].status = 'CONFIRMED';
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(allAppointments));
-                showAlert('Programare confirmată cu succes!', 'success');
-                loadAppointments();
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`API Error ${response.status}: ${errorText || response.statusText}`);
+                }
+                if (response.status === 204) return null; // No content for delete
+                return await response.json();
+            } catch (error) {
+                console.error(`Error in API call to ${url}:`, error);
+                showAlert(`Eroare: ${error.message}`, 'danger');
+                throw error;
             }
         }
-    }
 
-    function deleteAppointment(appointmentId) {
-        if (confirm('Sigur doriți să ștergeți această programare? Această acțiune este ireversibilă.')) {
-            allAppointments = allAppointments.filter(a => a.id !== appointmentId);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(allAppointments));
-            showAlert('Programare ștearsă cu succes!', 'success');
-            loadAppointments();
+        /**
+         * Cleans up string for CSV format.
+         */
+        function escapeCsv(value) {
+            if (value === null || value === undefined) return '';
+            let s = String(value).replace(/"/g, '""');
+            if (s.includes(',') || s.includes('\n') || s.includes('"')) {
+                return `"${s}"`;
+            }
+            return s;
         }
-    }
+
+        /**
+         * Extracts service name from additionalInfo for legacy/public appointments.
+         * (This is a fallback for data that might not be structured perfectly.)
+         */
+        function extractService(additionalInfo) {
+            if (!additionalInfo) return '';
+            const match = additionalInfo.match(/Serviciu solicitat:\s*([^\n]+)/i);
+            return match ? match[1].trim() : '';
+        }
+
+        // --- Load Data Functions ---
+
+        async function loadServices() {
+            try {
+                const services = await apiCall('/api/public/services');
+                allServices = services || [];
+
+                const newDropdown = document.getElementById('appointmentService');
+                const editDropdown = document.getElementById('editAppointmentService');
+
+                // Clear existing options, but keep the disabled one
+                newDropdown.innerHTML = '<option value="" disabled selected>Alege un Serviciu</option>';
+                editDropdown.innerHTML = '<option value="" disabled selected>Alege un Serviciu</option>';
+
+                allServices.forEach(service => {
+                    const option = new Option(`${service.numeServiciu} (${service.pretServiciu} RON, ${service.durataServiciu} min)`, service.numeServiciu);
+                    newDropdown.add(option.cloneNode(true));
+                    editDropdown.add(option);
+                });
+            } catch (e) {
+                console.error("Failed to load services:", e);
+                showAlert("Nu s-au putut încărca serviciile pentru formulare.", 'warning');
+            }
+        }
+
+        async function loadAppointments() {
+            loadingRow.style.display = 'table-row';
+            try {
+                const appointments = await apiCall('/api/appointments');
+                allAppointments = appointments || [];
+
+                if (allAppointments.length !== lastLoadedCount) {
+                     renderAppointments();
+                     lastLoadedCount = allAppointments.length;
+                }
+
+                // If there was an update from polling, show a subtle success message
+                if (allAppointments.length > lastLoadedCount && lastLoadedCount > 0) {
+                    showAlert(`S-a detectat o programare nouă!`, 'info');
+                }
+
+            } catch (e) {
+                console.error("Failed to load appointments:", e);
+                tableBody.innerHTML = '<tr><td colspan="9" class="text-center text-danger p-4"><i class="fas fa-exclamation-triangle me-2"></i>Eroare la încărcarea programărilor.</td></tr>';
+                // Stop polling if error is critical
+                if (e.message.includes("401") || e.message.includes("403")) stopPolling();
+            } finally {
+                loadingRow.style.display = 'none';
+            }
+        }
+
+        // --- Rendering Function ---
+
+        function getStatusBadge(status) {
+            const statusMap = {
+                'NOU': { text: 'Nou', class: 'badge text-bg-primary' },
+                'CONFIRMAT': { text: 'Confirmat', class: 'badge text-bg-success' },
+                'ANULAT': { text: 'Anulat', class: 'badge text-bg-danger' },
+                'FINALIZAT': { text: 'Finalizat', class: 'badge text-bg-secondary' },
+                'PENDING': { text: 'În așteptare', class: 'badge text-bg-warning' }, // For robustness
+            };
+            const { text, class: className } = statusMap[status.toUpperCase()] || statusMap.PENDING;
+            return `<span class="status-badge ${className}">${text}</span>`;
+        }
+
+        function renderAppointments() {
+            tableBody.innerHTML = '';
+            if (allAppointments.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="9" class="text-center text-muted p-4">Nu există programări înregistrate.</td></tr>';
+                return;
+            }
+
+            const rowsHtml = allAppointments.map(app => {
+                // Determine the service name for display (priority: stored value, fallback: info extraction)
+                const serviceDisplay = app.serviceName || extractService(app.additionalInfo);
+
+                return `
+                    <tr>
+                        <td>${app.id}</td>
+                        <td class="text-nowrap">${app.patientName || 'N/A'}</td>
+                        <td>${app.phoneNumber || 'N/A'}</td>
+                        <td>${serviceDisplay}</td>
+                        <td class="text-nowrap">${app.date || 'N/A'}</td>
+                        <td>${app.time || 'N/A'}</td>
+                        <td>${getStatusBadge(app.status)}</td>
+                        <td><small>${app.additionalInfo ? (app.additionalInfo.length > 50 ? app.additionalInfo.substring(0, 47) + '...' : app.additionalInfo) : '-'}</small></td>
+                        <td class="text-end table-actions">
+                            <div class="dropdown d-inline">
+                                <button class="btn btn-sm btn-info text-white dropdown-toggle btn-quick-status me-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Status
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="window.app.quickStatus(${app.id}, 'CONFIRMAT')"><i class="fas fa-check-circle text-success me-1"></i> Confirmat</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="window.app.quickStatus(${app.id}, 'ANULAT')"><i class="fas fa-times-circle text-danger me-1"></i> Anulat</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="window.app.quickStatus(${app.id}, 'FINALIZAT')"><i class="fas fa-calendar-alt text-secondary me-1"></i> Finalizat</a></li>
+                                </ul>
+                            </div>
+                            <button class="btn btn-sm btn-warning btn-quick-status me-2" onclick="window.app.edit(${app.id})" title="Editează">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger btn-quick-status" onclick="window.app.delete(${app.id})" title="Șterge">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            tableBody.innerHTML = rowsHtml;
+        }
+
+        // --- CRUD Operations ---
+
+        function getFormData(formId) {
+            const form = document.getElementById(formId);
+            const data = {};
+            new FormData(form).forEach((value, key) => data[key] = value);
+
+            // Collect manually specified fields if form is not fully controlled
+            data.patientName = document.getElementById(formId.replace('Form', 'Name')).value;
+            data.phoneNumber = document.getElementById(formId.replace('Form', 'Phone')).value;
+            data.serviceName = document.getElementById(formId.replace('Form', 'Service')).value;
+            data.date = document.getElementById(formId.replace('Form', 'Date')).value;
+            data.time = document.getElementById(formId.replace('Form', 'Time')).value;
+            data.status = document.getElementById(formId.replace('Form', 'Status')).value;
+            data.additionalInfo = document.getElementById(formId.replace('Form', 'Details')).value;
+
+            return data;
+        }
+
+        async function createAppointment() {
+            const formData = getFormData('newAppointmentForm');
+
+            // Simple validation
+            if (!formData.patientName || !formData.date || !formData.time || !formData.serviceName) {
+                showAlert('Vă rugăm completați câmpurile obligatorii (Nume, Serviciu, Data, Ora).', 'warning');
+                return;
+            }
+
+            const appointmentDTO = {
+                patientName: formData.patientName,
+                phoneNumber: formData.phoneNumber,
+                serviceName: formData.serviceName, // Store the chosen service name
+                date: formData.date,
+                time: formData.time,
+                status: formData.status,
+                // Combine details into additionalInfo as expected by the backend
+                additionalInfo: `Serviciu solicitat: ${formData.serviceName}\nNote: ${formData.additionalInfo || 'N/A'}`
+            };
+
+            try {
+                await apiCall('/api/appointments', 'POST', appointmentDTO);
+                newModal.hide();
+                document.getElementById('newAppointmentForm').reset();
+                await loadAppointments();
+                showAlert('Programare adăugată cu succes!', 'success');
+            } catch (e) {
+                // Error handled in apiCall
+            }
+        }
+
+        function openEdit(id) {
+            const app = allAppointments.find(a => a.id === id);
+            if (!app) {
+                showAlert('Programarea nu a fost găsită.', 'danger');
+                return;
+            }
+
+            document.getElementById('editAppointmentId').value = app.id;
+            document.getElementById('editAppointmentName').value = app.patientName || '';
+            document.getElementById('editAppointmentPhone').value = app.phoneNumber || '';
+            document.getElementById('editAppointmentDate').value = app.date || '';
+            document.getElementById('editAppointmentTime').value = app.time || '';
+            document.getElementById('editAppointmentStatus').value = app.status || 'NOU';
+
+            // Attempt to pre-select service
+            const serviceName = app.serviceName || extractService(app.additionalInfo);
+            const editDropdown = document.getElementById('editAppointmentService');
+            editDropdown.value = serviceName;
+
+            // Extract only the custom notes from additionalInfo, if possible
+            let notes = app.additionalInfo || '';
+            const match = notes.match(/Note:\s*(.*)/s); // Match everything after "Note:"
+            document.getElementById('editAppointmentDetails').value = match ? match[1].trim() : notes;
+
+
+            editModal.show();
+        }
+
+        async function updateAppointment() {
+            const id = document.getElementById('editAppointmentId').value;
+            const formData = getFormData('editAppointmentForm');
+
+            // Simple validation
+            if (!formData.patientName || !formData.date || !formData.time || !formData.serviceName) {
+                showAlert('Vă rugăm completați câmpurile obligatorii (Nume, Serviciu, Data, Ora).', 'warning');
+                return;
+            }
+
+            const appointmentDTO = {
+                id: id,
+                patientName: formData.patientName,
+                phoneNumber: formData.phoneNumber,
+                serviceName: formData.serviceName,
+                date: formData.date,
+                time: formData.time,
+                status: formData.status,
+                additionalInfo: `Serviciu solicitat: ${formData.serviceName}\nNote: ${formData.additionalInfo || 'N/A'}`
+            };
+
+            try {
+                await apiCall(`/api/appointments/${id}`, 'PUT', appointmentDTO);
+                editModal.hide();
+                await loadAppointments();
+                showAlert('Programare actualizată cu succes!', 'success');
+            } catch (e) {
+                // Error handled in apiCall
+            }
+        }
+
+        async function deleteAppointment(id) {
+            // Use custom modal logic in a real app, for this context we use a replacement for confirm
+            if (window.confirm('Ești sigur că vrei să ștergi această programare? Această acțiune este ireversibilă.')) {
+                 try {
+                    await apiCall(`/api/appointments/${id}`, 'DELETE');
+                    await loadAppointments();
+                    showAlert('Programare ștearsă cu succes!', 'success');
+                } catch (e) {
+                    // Error handled in apiCall
+                }
+            }
+        }
+
+        async function quickStatus(id, newStatus) {
+            const app = allAppointments.find(a => a.id === id);
+            if (!app) {
+                showAlert('Programarea nu a fost găsită.', 'danger');
+                return;
+            }
+
+            if (app.status === newStatus) {
+                showAlert(`Programarea ${id} este deja în statusul ${newStatus}.`, 'info');
+                return;
+            }
+
+            const updatedApp = { ...app, status: newStatus };
+            // Ensure the payload structure is correct for the PUT endpoint
+            const appointmentDTO = {
+                id: updatedApp.id,
+                patientName: updatedApp.patientName,
+                phoneNumber: updatedApp.phoneNumber,
+                serviceName: updatedApp.serviceName,
+                date: updatedApp.date,
+                time: updatedApp.time,
+                status: updatedApp.status,
+                additionalInfo: updatedApp.additionalInfo
+            };
+
+            try {
+                await apiCall(`/api/appointments/${id}`, 'PUT', appointmentDTO);
+                await loadAppointments(); // Reload to see the change
+                showAlert(`Statusul programării ${id} a fost actualizat la ${newStatus}.`, 'success');
+            } catch (e) {
+                 // Error handled in apiCall
+            }
+        }
+
+
+        // --- Export & Polling ---
+
+        function exportCSV() {
+            // FIXED: Header string is now inside a JS context, avoiding Thymeleaf parsing
+            const headers = ['ID', 'Nume', 'Telefon', 'Serviciu', 'Data', 'Ora', 'Status', 'Detalii'];
+            const rows = [headers.map(escapeCsv).join(',')];
+
+            allAppointments.forEach(a => {
+                const serviceDisplay = a.serviceName || extractService(a.additionalInfo);
+                const infoContent = (a.additionalInfo || '').replace(/\n/g, ' | '); // Replace newlines in info
+
+                rows.push([
+                    escapeCsv(a.id),
+                    escapeCsv(a.patientName),
+                    escapeCsv(a.phoneNumber),
+                    escapeCsv(serviceDisplay),
+                    escapeCsv(a.date),
+                    escapeCsv(a.time),
+                    escapeCsv(a.status),
+                    escapeCsv(infoContent)
+                ].join(','));
+            });
+
+            const csvContent = rows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+
+            link.setAttribute("href", url);
+            link.setAttribute("download", "programari_kineto.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showAlert('Datele au fost exportate cu succes în programari_kineto.csv!', 'info');
+        }
+
+        function startPolling() {
+            if (!pollingInterval) {
+                pollingInterval = setInterval(loadAppointments, POLLING_RATE);
+                console.log("Polling started for appointments...");
+            }
+        }
+
+        function stopPolling() {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+                console.log("Polling stopped for appointments.");
+            }
+        }
+
+
+        // --- Initialization ---
+
+        function wireEvents() {
+            document.getElementById('saveAppointmentBtn').addEventListener('click', createAppointment);
+            document.getElementById('updateAppointmentBtn').addEventListener('click', updateAppointment);
+
+            // Auto-refresh toggle
+            autoRefreshToggle.addEventListener('change', function () {
+                if (this.checked) startPolling(); else stopPolling();
+            });
+
+            // Expose functions globally for inline onclicks (quickStatus, edit, delete, export)
+            window.app = {
+                edit: openEdit,
+                delete: deleteAppointment,
+                quickStatus: quickStatus,
+                exportCSV: exportCSV
+            };
+
+            // Set today's date as default in modals
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('appointmentDate').value = today;
+            document.getElementById('editAppointmentDate').value = today;
+        }
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            wireEvents();
+            await loadServices();
+            await loadAppointments();
+
+            if (autoRefreshToggle.checked) {
+                startPolling();
+            }
+        });
+
+    })();
+    /*[/]*/
 </script>
+<!-- A necessary Thymeleaf template for the sidebar, must be outside the JS block -->
+<div th:fragment="sidebar(currentPage)" class="col-md-3 col-lg-2 d-md-block sidebar collapse p-0">
+    <div class="d-flex flex-column flex-shrink-0 p-3 text-white" style="width: 100%; height: 100%;">
+        <a href="/admin/dashboard" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+            <i class="fas fa-hand-holding-medical fa-2x me-2"></i>
+            <span class="fs-4">Kineto Admin</span>
+        </a>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a href="/admin/dashboard" class="nav-link text-white" th:classappend="${currentPage == 'dashboard' ? 'active' : ''}">
+                    <i class="fas fa-tachometer-alt me-2"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/appointments" class="nav-link text-white" th:classappend="${currentPage == 'appointments' ? 'active' : ''}">
+                    <i class="fas fa-calendar-check me-2"></i>
+                    Programări
+                </a>
+            </li>
+            <li>
+                <a href="/admin/services" class="nav-link text-white" th:classappend="${currentPage == 'services' ? 'active' : ''}">
+                    <i class="fas fa-clipboard-list me-2"></i>
+                    Servicii
+                </a>
+            </li>
+        </ul>
+        <hr>
+        <div>
+            <a href="/logout" class="nav-link text-white">
+                <i class="fas fa-sign-out-alt me-2"></i>
+                Deconectare
+            </a>
+        </div>
+    </div>
+</div>
 </body>
 </html>

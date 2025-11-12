@@ -27,6 +27,8 @@ public class ViewController {
         model.addAttribute("totalServices", totalServices);
         model.addAttribute("totalAppointments", totalAppointments);
         model.addAttribute("pageTitle", "Dashboard Admin - Kineto");
+        // ADDED: Set current page for sidebar highlighting
+        model.addAttribute("currentPage", "dashboard");
         return "AdminDashboard";
     }
 
@@ -34,6 +36,8 @@ public class ViewController {
     public String appointmentsManagement(Model model) {
         // Appointments will be loaded via JavaScript from API
         model.addAttribute("pageTitle", "Gestionare Programări - Kineto");
+        // ADDED: Set current page for sidebar highlighting (Fixes 500 error)
+        model.addAttribute("currentPage", "appointments");
         return "AppointmentsManagement";
     }
 
@@ -41,6 +45,8 @@ public class ViewController {
     public String serviceManagement(Model model) {
         // Services will be loaded via JavaScript from API
         model.addAttribute("pageTitle", "Gestionare Servicii - Kineto");
+        // ADDED: Set current page for sidebar highlighting
+        model.addAttribute("currentPage", "services");
         return "ServiceManagement";
     }
 

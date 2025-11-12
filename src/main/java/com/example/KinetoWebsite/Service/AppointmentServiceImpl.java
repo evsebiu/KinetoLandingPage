@@ -61,10 +61,13 @@ public class AppointmentServiceImpl implements AppointmentService{
                         .orElseThrow(()-> new com.example.KinetoWebsite.Exceptions.IllegalArgumentException("" +
                                 "Appointment with id: " + id + " not found"));
 
-        existingAppointment.setPhoneNumber(appointmentDTO.getPhoneNumber());
         existingAppointment.setPatientName(appointmentDTO.getPatientName());
-        existingAppointment.setAdditionalInfo(appointmentDTO.getAdditionalInfo());
+        existingAppointment.setPhoneNumber(appointmentDTO.getPhoneNumber());
         existingAppointment.setDate(appointmentDTO.getDate());
+        existingAppointment.setAdditionalInfo(appointmentDTO.getAdditionalInfo());
+        existingAppointment.setServiceName(appointmentDTO.getServiceName());
+        existingAppointment.setTime(appointmentDTO.getTime());
+        existingAppointment.setStatus(appointmentDTO.getStatus());
 
         Appointment updatedAppointment  = appointmentRepository.save(existingAppointment);
         return appointmentMapper.toDTO(updatedAppointment);

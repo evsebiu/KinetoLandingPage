@@ -37,6 +37,10 @@ public class Appointment {
     @Column(name = "additional_info")
     private String additionalInfo;
 
+    private String serviceName;
+    private String time;
+    private String status = "NOU";
+
 
 
 
