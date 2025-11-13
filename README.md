@@ -1,85 +1,98 @@
-# KinetoLandingPage
+🌿 KinetoLandingPage
 
 Responsive landing page built with Spring Boot and Thymeleaf for a local business. Displays services with pricing and duration, allowing customers to call directly for appointments. Focused on clean architecture, maintainability, and real-world usability.
 
-## Key Features & Benefits
+✨ Key Features & Benefits
 
-*   **Responsive Design:**  Provides a seamless experience across various devices (desktops, tablets, and smartphones).
-*   **Service Showcase:**  Clearly presents services offered, including pricing and duration details.
-*   **Direct Call Integration:**  Facilitates immediate appointment booking by allowing customers to call directly from the landing page.
-*   **Spring Boot Powered:**  Leverages the power and efficiency of Spring Boot for backend functionality.
-*   **Thymeleaf Templating:**  Utilizes Thymeleaf for dynamic content rendering and a clean, maintainable frontend.
-*   **Clean Architecture:**  Adheres to a clean and well-structured architecture, promoting maintainability and scalability.
+📱 Responsive Design: Seamless experience across desktops, tablets, and smartphones.
 
-## Prerequisites & Dependencies
+💆 Service Showcase: Clear presentation of services, pricing, and duration.
 
-Before you begin, ensure you have the following installed:
+☎️ Direct Call Integration: Customers can call directly to book appointments.
 
-*   **Java Development Kit (JDK):** Version 11 or higher.
-*   **Maven:**  Version 3.6.0 or higher.
-*   **An IDE (Integrated Development Environment):**  Such as IntelliJ IDEA or Eclipse.
-*   **A phone app capable of making calls (for testing the direct call feature).**
+⚙️ Spring Boot Powered: Reliable, efficient backend with Spring Boot.
 
-## Installation & Setup Instructions
+🧩 Thymeleaf Templating: Clean, maintainable, and dynamic frontend rendering.
 
-1.  **Clone the repository:**
+🧱 Clean Architecture: Organized structure that promotes scalability and easy maintenance.
 
-    ```bash
-    git clone https://github.com/evsebiu/KinetoLandingPage.git
-    cd KinetoLandingPage
-    ```
+🧰 Prerequisites & Dependencies
 
-2.  **Build the project using Maven:**
+Make sure you have these installed before starting:
 
-    ```bash
-    ./mvnw clean install
-    ```
+☕ Java Development Kit (JDK): Version 11 or higher
 
-3.  **Run the application:**
+📦 Maven: Version 3.6.0 or higher
 
-    ```bash
-    ./mvnw spring-boot:run
-    ```
+🧠 IDE: IntelliJ IDEA, Eclipse, or any preferred Java IDE
 
-    Alternatively, you can package the application into a JAR file and run it:
+📞 Phone App: To test the direct call feature
 
-    ```bash
-    ./mvnw package
-    java -jar target/KinetoWebsite-0.0.1-SNAPSHOT.jar
-    ```
+⚡ Installation & Setup Instructions
 
-4.  **Access the landing page:**
+Clone the repository:
 
-    Open your web browser and navigate to `http://localhost:8080`.
+git clone https://github.com/evsebiu/KinetoLandingPage.git
+cd KinetoLandingPage
 
-## Usage Examples & API Documentation
 
-This project is primarily a landing page. There is no exposed API for external consumption.  The `PublicController` handles requests for the main landing page. The `AdminController` is likely for internal management (although details are not provided, it probably requires authentication).
+Build the project using Maven:
 
-## Configuration Options
+./mvnw clean install
 
-The application's properties can be configured through the `application.properties` file.
 
-*   **Server Port:**  `server.port` (defaults to 8080).
-*   **Database Connection:** (If a database were added, properties would configure the connection).
-*   **Security Settings:** (Configuration for authentication and authorization).
+Run the application:
 
-## Contributing Guidelines
+./mvnw spring-boot:run
 
-We welcome contributions to this project! If you'd like to contribute, please follow these guidelines:
 
-1.  **Fork the repository.**
-2.  **Create a new branch for your feature or bug fix.**
-3.  **Make your changes and test thoroughly.**
-4.  **Submit a pull request with a clear description of your changes.**
+Or package and run it manually:
 
-Please adhere to the existing code style and conventions.
+./mvnw package
+java -jar target/KinetoWebsite-0.0.1-SNAPSHOT.jar
 
-## License Information
 
-This project is licensed under [MIT License].
+Access the landing page:
+Open your browser and visit 👉 http://localhost:8080
 
-## Acknowledgments
+💡 Usage Examples & API Info
 
-*   This project utilizes the Spring Boot framework.
-*   This project utilizes the Thymeleaf templating engine.
+This project is mainly a landing page, not an API service.
+
+PublicController → handles requests for the main page.
+
+AdminController → for internal management (likely requires authentication).
+
+⚙️ Configuration Options
+
+All app configurations live in the application.properties file:
+
+🔌 Server Port: server.port (default: 8080)
+
+🗄️ Database: (Future-ready if you add one)
+
+🔐 Security Settings: Authentication & authorization configs (if needed)
+
+🤝 Contributing Guidelines
+
+We’d love your help improving this project!
+
+🍴 Fork the repo
+
+🌿 Create a branch for your feature or fix
+
+🧪 Test thoroughly
+
+📬 Submit a pull request with a clear description
+
+Please stick to the existing code style and conventions.
+
+📄 License
+
+This project is licensed under the MIT License.
+
+🙏 Acknowledgments
+
+💚 Built with Spring Boot
+
+🧠 Powered by Thymeleaf
