@@ -32,18 +32,6 @@ This application simplifies the process of establishing a professional online fo
 
 ---
 
-## 📸 Showcase
-
-Catch a glimpse of the KinetoLandingPage in action!
-
-![Homepage Screenshot](path/to/screenshot-homepage.png)
-_A clean and welcoming homepage for clients._
-
-![Price List View](path/to/screenshot-pricelist.png)
-_Clearly displayed services and prices._
-
----
-
 ## 🛠️ Tech Stack & Tools
 
 This project is built using a modern and powerful set of technologies:
