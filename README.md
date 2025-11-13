@@ -169,7 +169,6 @@ Please ensure your code adheres to the project's coding standards and includes a
 ## ⚖️ License
 
 This project is licensed under the MIT License - see the `LICENSE` file for details.
-*(If a LICENSE file is not present, it is recommended to add one.)*
 
 ---
 
@@ -184,7 +183,7 @@ This project is licensed under the MIT License - see the `LICENSE` file for deta
 
 For any questions, suggestions, or collaborations, feel free to reach out!
 
-**Your Name/Organization** - [your_email@example.com](mailto:your_email@example.com)
+Eusebiu Tatarciuc - evsebiu@gmail.com
 
 Project Link: [https://github.com/your-org/KinetoLandingPage](https://github.com/your-org/KinetoLandingPage)
 
