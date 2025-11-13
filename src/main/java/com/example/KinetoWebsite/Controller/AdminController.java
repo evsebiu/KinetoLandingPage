@@ -1,6 +1,7 @@
 package com.example.KinetoWebsite.Controller;
 
 import com.example.KinetoWebsite.Model.DTO.ServiceDetailsDTO;
+import com.example.KinetoWebsite.Service.ServiceDetailsService;
 import com.example.KinetoWebsite.Service.ServiceDetailsServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +12,9 @@ import java.util.List;
 @RequestMapping("/api/admin")
 public class AdminController {
 
-    private final ServiceDetailsServiceImpl serviceDetailsService;
+    private final ServiceDetailsService serviceDetailsService;
 
-    public AdminController(ServiceDetailsServiceImpl serviceDetailsService){
+    public AdminController(ServiceDetailsService serviceDetailsService){
         this.serviceDetailsService = serviceDetailsService;
     }
 

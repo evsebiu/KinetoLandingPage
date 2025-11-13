@@ -455,6 +455,13 @@
                             <label for="message" class="form-label">Mesaj (opțional)</label>
                             <textarea class="form-control" id="message" rows="4" placeholder="Descrieți problema sau cerințele speciale..."></textarea>
                         </div>
+                        <div class="mb-4">
+                            <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+                            <div id="recaptcha-error" class="text-danger small mt-2" style="display: none;">
+                                <i class="fas fa-exclamation-circle me-1"></i>Vă rugăm să verificați că nu sunteți robot.
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn btn-primary btn-lg w-100 py-3">
                             <i class="fas fa-paper-plane me-2"></i>Trimite Cererea
                         </button>
@@ -542,7 +549,7 @@
         </div>
     </div>
 </footer>
-
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // Load services from your backend API
@@ -552,56 +559,27 @@
         setupSmoothScroll();
     });
 
-    function saveAppointmentToBackend(appointmentData) {
-    const appointmentDTO = {
-        patientName: appointmentData.clientName,
-        phoneNumber: appointmentData.clientPhone,
-        date: appointmentData.date || new Date().toISOString().split('T')[0],
-        additionalInfo: `Serviciu: ${appointmentData.serviceName}. ${appointmentData.message || 'Niciun mesaj adițional'}`
-    };
-
-    fetch('/api/appointments', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(appointmentDTO)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Appointment saved to backend:', data);
-        showAppointmentSuccess(appointmentData);
-        document.getElementById('appointmentForm').reset();
-    })
-    .catch(error => {
-        console.error('Error saving appointment to backend:', error);
-        // Show error message to user
-        alert('A apărut o eroare la salvarea programării. Vă rugăm să încercați din nou sau să ne contactați direct.');
-    });
-}
-
     function loadServices() {
-    fetch('/api/public/services')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(services => {
-            displayServices(services);
-            populateServiceDropdown(services);
-        })
-        .catch(error => {
-            console.error('Error loading services:', error);
-            showNoServices();
-        });
-}
+        console.log('Loading services from /api/public/services');
+
+        fetch('/api/public/services')
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(services => {
+                console.log('Services loaded successfully:', services);
+                displayServices(services);
+                populateServiceDropdown(services);
+            })
+            .catch(error => {
+                console.error('Error loading services:', error);
+                showNoServices();
+            });
+    }
 
     function displayServices(services) {
         const container = document.getElementById('servicesContainer');
@@ -678,7 +656,7 @@
                 clientPhone: document.getElementById('phone').value,
                 serviceName: document.getElementById('service').value,
                 date: document.getElementById('date').value,
-                message: document.getElementById('message').value
+                message: document.getElementById('message').value,
             };
 
             // Basic validation
@@ -693,68 +671,49 @@
     }
 
     function saveAppointmentToBackend(appointmentData) {
-    const appointmentDTO = {
-        patientName: appointmentData.clientName,
-        phoneNumber: appointmentData.clientPhone,
-        date: appointmentData.date || new Date().toISOString().split('T')[0],
-        serviceName: appointmentData.serviceName,
-        time: "09:00", // Default time
-        status: "NOU", // Default status
-        additionalInfo: `Serviciu: ${appointmentData.serviceName}. ${appointmentData.message || 'Niciun mesaj adițional'}`
-    };
+        // Show loading state
+        const submitBtn = document.querySelector('#appointmentForm button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Se trimite...';
+        submitBtn.disabled = true;
 
-    fetch('/api/appointments', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(appointmentDTO)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Appointment saved to backend:', data);
-        showAppointmentSuccess(appointmentData);
-        document.getElementById('appointmentForm').reset();
-    })
-    .catch(error => {
-        console.error('Error saving appointment to backend:', error);
-        alert('A apărut o eroare la salvarea programării. Vă rugăm să încercați din nou sau să ne contactați direct.');
-    });
-    }
-
-    function saveToLocalStorage(appointmentData) {
-        const STORAGE_KEY = 'kineto_appointments';
-        let appointments = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-
-        const newAppointment = {
-            id: appointments.length > 0 ? Math.max(...appointments.map(a => a.id)) + 1 : 1,
-            clientName: appointmentData.clientName,
-            clientPhone: appointmentData.clientPhone,
-            serviceName: appointmentData.serviceName,
-            servicePrice: getServicePrice(appointmentData.serviceName),
+        const appointmentDTO = {
+            patientName: appointmentData.clientName,
+            phoneNumber: appointmentData.clientPhone,
             date: appointmentData.date || new Date().toISOString().split('T')[0],
-            time: '09:00',
-            status: 'PENDING',
-            notes: appointmentData.message || '',
-            createdAt: new Date().toISOString()
+            serviceName: appointmentData.serviceName,
+            time: "09:00",
+            status: "NOU",
+            additionalInfo: `Serviciu: ${appointmentData.serviceName}. ${appointmentData.message || 'Niciun mesaj adițional'}`
         };
 
-        appointments.push(newAppointment);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
-    }
-
-    function getServicePrice(serviceName) {
-        const prices = {
-            'Masaj Terapeutic': 150,
-            'Fizioterapie': 120,
-            'Kinetoterapie': 130
-        };
-        return prices[serviceName] || 0;
+        fetch('/api/appointments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(appointmentDTO)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Appointment saved to backend:', data);
+            showAppointmentSuccess(appointmentData);
+            document.getElementById('appointmentForm').reset();
+        })
+        .catch(error => {
+            console.error('Error saving appointment to backend:', error);
+            alert('A apărut o eroare la salvarea programării. Vă rugăm să încercați din nou sau să ne contactați direct.');
+        })
+        .finally(() => {
+            // Restore button state
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
     }
 
     function showAppointmentSuccess(data) {

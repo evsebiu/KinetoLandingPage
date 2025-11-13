@@ -19,6 +19,8 @@ public class AppointmentDTO {
 
     private Long id;
 
+    private String chaptchaResponse;
+
     @NotNull(message = "Name is required.")
     @Size(min = 2, max = 25, message = "Name should be between 2 and 25 characters.")
     private String patientName;

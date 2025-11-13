@@ -2,12 +2,14 @@ package com.example.KinetoWebsite.Controller;
 
 import com.example.KinetoWebsite.Model.DTO.AppointmentDTO;
 import com.example.KinetoWebsite.Service.AppointmentService;
+import com.example.KinetoWebsite.Service.RecaptchaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/appointments")
@@ -15,9 +17,11 @@ import java.util.List;
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
+    private final RecaptchaService recaptchaService;
 
-    public AppointmentController(AppointmentService appointmentService){
+    public AppointmentController(AppointmentService appointmentService, RecaptchaService recaptchaService){
         this.appointmentService = appointmentService;
+        this.recaptchaService=recaptchaService;
     }
 
     @GetMapping
@@ -34,9 +38,22 @@ public class AppointmentController {
     }
 
     @PostMapping
-    public ResponseEntity<AppointmentDTO> createAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO) {
-        AppointmentDTO createdAppointment = appointmentService.createAppointment(appointmentDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdAppointment);
+    public ResponseEntity<?> createAppointment(@RequestBody AppointmentDTO appointmentDTO) {
+        // Verify CAPTCHA first
+       /* if (!recaptchaService.verifyRecaptcha(appointmentDTO.getChaptchaResponse())) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("error", "CAPTCHA verification failed", "message", "Vă rugăm să verificați că nu sunteți robot.")
+            );
+        } */
+
+        try{
+            AppointmentDTO savedAppointment = appointmentService.createAppointment(appointmentDTO);
+            return ResponseEntity.ok(savedAppointment);
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(
+                    Map.of("error", "Appointment creation failed", "message", e.getMessage())
+            );
+        }
     }
 
     @PutMapping("/{id}")
