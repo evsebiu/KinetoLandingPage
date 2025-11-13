@@ -36,8 +36,6 @@ This application simplifies the process of establishing a professional online fo
 
 Catch a glimpse of the KinetoLandingPage in action!
 
-*(Add your stunning screenshots or animated GIFs here to visually demonstrate the application's features and user interface.)*
-
 ![Homepage Screenshot](path/to/screenshot-homepage.png)
 _A clean and welcoming homepage for clients._
 
