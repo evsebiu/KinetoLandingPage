@@ -4,6 +4,7 @@ import com.example.KinetoWebsite.Model.DTO.AppointmentDTO;
 import com.example.KinetoWebsite.Model.Entity.Appointment;
 import com.example.KinetoWebsite.Model.Mapper.AppointmentMapper;
 import com.example.KinetoWebsite.Repository.AppointmentRepository;
+import jakarta.validation.constraints.Email;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,11 +18,14 @@ public class AppointmentServiceImpl implements AppointmentService{
 
     private final AppointmentRepository appointmentRepository;
     private final AppointmentMapper appointmentMapper;
+    private final EmailService emailService;
 
     AppointmentServiceImpl(AppointmentRepository appointmentRepository,
-                           AppointmentMapper appointmentMapper){
+                           AppointmentMapper appointmentMapper,
+                           EmailService emailService){
         this.appointmentMapper = appointmentMapper;
         this.appointmentRepository=appointmentRepository;
+        this.emailService=emailService;
     }
 
     @Override
@@ -46,7 +50,34 @@ public class AppointmentServiceImpl implements AppointmentService{
         Appointment appointmentDetails = appointmentMapper.toEntity(appointmentDTO);
         Appointment savedAppointment = appointmentRepository.save(appointmentDetails);
 
+        sendAppointmentConfirmation(appointmentDTO);
         return appointmentMapper.toDTO(savedAppointment);
+    }
+
+    @Override
+    public void sendAppointmentConfirmation(AppointmentDTO appointmentDTO){
+        String subject = "Appointment confirmation " + appointmentDTO.getPatientName();
+
+        String body = String.format(
+                "Dear %s,\n\n" +
+                        "new appointment!\n\n" +
+                        "Patient name:\n" +
+                        "Service: %s\n" +
+                        "Phone number: %s\n" +
+                        "Additional info: %s\n" +
+                        "End Time: %s\n\n" +
+                        "Thank you for choosing our service!",
+                appointmentDTO.getPatientName(),
+                appointmentDTO.getServiceName(),
+                appointmentDTO.getPhoneNumber(),
+                appointmentDTO.getAdditionalInfo(),
+                appointmentDTO.getTime()
+        );
+        emailService.sentAppointmentEmail(
+                appointmentDTO.getCustomerEmail(),
+                subject,
+                body
+        );
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.example.KinetoWebsite.Model.Entity;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,6 +33,10 @@ public class Appointment {
     @NotNull(message = "Date is required.")
     @Column(name = "local_date", nullable = false)
     private LocalDate date;
+
+    @Email
+    @NotNull
+    private String customerEmail;
 
 
     @Column(name = "additional_info")

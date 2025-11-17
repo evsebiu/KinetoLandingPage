@@ -1,6 +1,7 @@
 package com.example.KinetoWebsite.Service;
 
 import com.example.KinetoWebsite.Model.DTO.AppointmentDTO;
+import com.example.KinetoWebsite.Model.Entity.Appointment;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +18,5 @@ public interface AppointmentService {
     AppointmentDTO createAppointment(AppointmentDTO appointmentDTO);
     void deleteAppointment(Long id);
     AppointmentDTO updateAppointment(Long id, AppointmentDTO appointmentDTO);
+    void sendAppointmentConfirmation(AppointmentDTO appointmentDTO);
 }

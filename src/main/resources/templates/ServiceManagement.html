@@ -432,11 +432,11 @@
 
     function setupEventListeners() {
         // Search on Enter key
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchServices();
-            }
-        });
+      document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+    if (serviceToDeleteId) {
+        deleteService(serviceToDeleteId); // <-- This calls the deletion API
+    }
+});
 
         // Confirm delete button
         document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
@@ -641,7 +641,7 @@
 
     function editService(serviceId) {
         const service = allServices.find(s => s.id === serviceId);
-        if (!service) {
+        if (!service || !service.id) {
             showAlert('Serviciul nu a fost găsit!', 'danger');
             return;
         }
@@ -679,26 +679,43 @@
 
         const serviceId = document.getElementById('serviceId').value;
 
-        // Validation
+        // --- NEW VALIDATION AND GUARD BLOCK ---
+        // 1. Standard Client-Side Validation (Required fields)
         if (!validateForm(formData)) {
+            // The validateForm function will add 'is-invalid' classes
             return;
         }
 
-        // Show loading state on button
+        // 2. Edit Mode Guard (Ensures ID is present and valid for PUT request)
+        if (editMode) {
+            if (!serviceId || serviceId === "undefined" || isNaN(parseInt(serviceId))) {
+                showAlert('Eroare: ID-ul serviciului lipsește pentru modificare.', 'danger');
+                return; // STOP execution if ID is invalid during edit
+            }
+        }
+        // --- END VALIDATION AND GUARD BLOCK ---
+
+        // 3. Determine URL and Method (ONLY ONCE)
+        const url = editMode ? `/api/admin/services/${serviceId}` : '/api/admin/services';
+        const method = editMode ? 'PUT' : 'POST';
+
+        // 4. Show loading state on button
         const saveBtn = document.getElementById('saveServiceBtn');
         const originalText = saveBtn.innerHTML;
         saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Se salvează...';
         saveBtn.disabled = true;
 
-        const url = editMode ? `/api/admin/services/${serviceId}` : '/api/admin/services';
-        const method = editMode ? 'PUT' : 'POST';
-
+        // 5. API Call
         apiCall(url, method, formData)
             .then(() => {
                 serviceModal.hide();
                 document.getElementById('serviceForm').reset();
                 loadServices(); // Reload services to get updated data
                 showAlert(`Serviciu ${editMode ? 'modificat' : 'adăugat'} cu succes!`, 'success');
+            })
+            .catch(() => {
+                // The apiCall utility already shows an alert on error,
+                // but we need to restore the button state even on failure.
             })
             .finally(() => {
                 // Restore button state
@@ -766,4 +783,5 @@
     }
 </script>
 </body>
+</html>
 </html>

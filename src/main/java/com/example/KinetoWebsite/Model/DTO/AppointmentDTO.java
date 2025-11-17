@@ -2,10 +2,7 @@ package com.example.KinetoWebsite.Model.DTO;
 
 
 import jakarta.persistence.Column;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,6 +29,10 @@ public class AppointmentDTO {
     @NotNull(message = "Date is required.")
     @FutureOrPresent(message = "Appointment date must be today or in the future")
     private LocalDate date;
+
+    @NotNull
+    @Email
+    private String customerEmail;
 
     private String additionalInfo;
 
