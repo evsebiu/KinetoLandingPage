@@ -35,7 +35,7 @@ public class Appointment {
     private LocalDate date;
 
     @Email
-    @NotNull
+    @NotNull(message = "Email is required.")
     private String customerEmail;
 
 

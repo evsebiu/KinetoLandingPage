@@ -671,50 +671,55 @@
     }
 
     function saveAppointmentToBackend(appointmentData) {
-        // Show loading state
-        const submitBtn = document.querySelector('#appointmentForm button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Se trimite...';
-        submitBtn.disabled = true;
+    // Show loading state
+    const submitBtn = document.querySelector('#appointmentForm button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Se trimite...';
+    submitBtn.disabled = true;
 
-        const appointmentDTO = {
-            patientName: appointmentData.clientName,
-            phoneNumber: appointmentData.clientPhone,
-            date: appointmentData.date || new Date().toISOString().split('T')[0],
-            serviceName: appointmentData.serviceName,
-            time: "09:00",
-            status: "NOU",
-            additionalInfo: `Serviciu: ${appointmentData.serviceName}. ${appointmentData.message || 'Niciun mesaj adițional'}`
-        };
+    const appointmentDTO = {
+        patientName: appointmentData.clientName,
+        phoneNumber: appointmentData.clientPhone,
+        date: appointmentData.date || new Date().toISOString().split('T')[0],
+        serviceName: appointmentData.serviceName,
+        time: "09:00",
+        status: "NOU",
+        additionalInfo: `Serviciu solicitat: ${appointmentData.serviceName}\nMesaj client: ${appointmentData.message || 'Niciun mesaj adițional'}`
+    };
 
-        fetch('/api/appointments', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(appointmentDTO)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Appointment saved to backend:', data);
-            showAppointmentSuccess(appointmentData);
-            document.getElementById('appointmentForm').reset();
-        })
-        .catch(error => {
-            console.error('Error saving appointment to backend:', error);
-            alert('A apărut o eroare la salvarea programării. Vă rugăm să încercați din nou sau să ne contactați direct.');
-        })
-        .finally(() => {
-            // Restore button state
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        });
-    }
+    console.log('Sending appointment data:', appointmentDTO);
+
+    fetch('/api/appointments', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(appointmentDTO)
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`Server returned ${response.status}: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Appointment saved successfully:', data);
+        showAppointmentSuccess(appointmentData);
+        document.getElementById('appointmentForm').reset();
+    })
+    .catch(error => {
+        console.error('Error saving appointment:', error);
+        alert('A apărut o eroare la salvarea programării: ' + error.message + '\nVă rugăm să încercați din nou sau să ne contactați direct.');
+    })
+    .finally(() => {
+        // Restore button state
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
 
     function showAppointmentSuccess(data) {
         const alert = document.createElement('div');

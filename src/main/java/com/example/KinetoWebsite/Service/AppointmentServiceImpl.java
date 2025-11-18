@@ -50,12 +50,12 @@ public class AppointmentServiceImpl implements AppointmentService{
         Appointment appointmentDetails = appointmentMapper.toEntity(appointmentDTO);
         Appointment savedAppointment = appointmentRepository.save(appointmentDetails);
 
-        sendAppointmentConfirmation(appointmentDTO);
+        sendAdminNotification(appointmentDTO);
         return appointmentMapper.toDTO(savedAppointment);
     }
 
     @Override
-    public void sendAppointmentConfirmation(AppointmentDTO appointmentDTO){
+    public void sendAdminNotification(AppointmentDTO appointmentDTO){
         String subject = "Appointment confirmation " + appointmentDTO.getPatientName();
 
         String body = String.format(
@@ -73,11 +73,7 @@ public class AppointmentServiceImpl implements AppointmentService{
                 appointmentDTO.getAdditionalInfo(),
                 appointmentDTO.getTime()
         );
-        emailService.sentAppointmentEmail(
-                appointmentDTO.getCustomerEmail(),
-                subject,
-                body
-        );
+        emailService.sendAdminNotification(subject,body);
     }
 
     @Override
