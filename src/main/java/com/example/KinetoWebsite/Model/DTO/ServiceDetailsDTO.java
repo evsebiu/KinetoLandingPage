@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 
 public class ServiceDetailsDTO {
 
+    private Long id;
+
     private String numeServiciu;
 
     private String descriereServiciu;

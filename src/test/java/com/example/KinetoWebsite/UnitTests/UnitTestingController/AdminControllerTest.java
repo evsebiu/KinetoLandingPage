@@ -108,7 +108,7 @@ class AdminControllerTest {
         doNothing().when(serviceDetailsService).deleteService(serviceId);
 
         //Act
-        ResponseEntity<ServiceDetailsDTO> response = adminController.deleteService(serviceId);
+        ResponseEntity<Void> response = adminController.deleteService(serviceId);
 
         //Assert
         assertNotNull(response);

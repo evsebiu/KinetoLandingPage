@@ -35,7 +35,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/services/{id}")
-    public ResponseEntity<ServiceDetailsDTO> deleteService(@PathVariable Long id){
+    public ResponseEntity<Void> deleteService(@PathVariable Long id){
         serviceDetailsService.deleteService(id);
         return ResponseEntity.ok().build();
     }

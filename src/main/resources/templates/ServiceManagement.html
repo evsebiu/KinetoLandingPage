@@ -639,33 +639,33 @@
         });
     }
 
-    function editService(serviceId) {
-        const service = allServices.find(s => s.id === serviceId);
-        if (!service || !service.id) {
-            showAlert('Serviciul nu a fost găsit!', 'danger');
-            return;
-        }
+   function editService(serviceId) {
+    console.log('Editing service ID:', serviceId); // Debug line
 
-        editMode = true;
-        document.getElementById('serviceModalTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Modifică Serviciu';
-
-        // Fill form with service data
-        document.getElementById('serviceId').value = service.id;
-        document.getElementById('numeServiciu').value = service.numeServiciu || '';
-        document.getElementById('descriereServiciu').value = service.descriereServiciu || '';
-        document.getElementById('pretServiciu').value = service.pretServiciu || '';
-        document.getElementById('durataServiciu').value = service.durataServiciu || '';
-        document.getElementById('contact').value = service.contact || '';
-        document.getElementById('categorie').value = service.categorie || '';
-
-        // Remove validation classes
-        const inputs = document.querySelectorAll('#serviceForm input, #serviceForm textarea');
-        inputs.forEach(input => {
-            input.classList.remove('is-invalid');
-        });
-
-        serviceModal.show();
+    const service = allServices.find(s => s.id === serviceId);
+    if (!service) {
+        showAlert('Serviciul nu a fost găsit!', 'danger');
+        return;
     }
+
+    // Debug: afișează datele serviciului
+    console.log('Service data:', service);
+
+    editMode = true;
+    document.getElementById('serviceModalTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Modifică Serviciu';
+
+    // Fill form with service data
+    document.getElementById('serviceId').value = service.id;
+    document.getElementById('numeServiciu').value = service.numeServiciu || '';
+    document.getElementById('descriereServiciu').value = service.descriereServiciu || '';
+    document.getElementById('pretServiciu').value = service.pretServiciu || '';
+    document.getElementById('durataServiciu').value = service.durataServiciu || '';
+    document.getElementById('contact').value = service.contact || '';
+    // Eliminați sau comentați linia cu categorie dacă nu există în backend
+    // document.getElementById('categorie').value = service.categorie || '';
+
+    serviceModal.show();
+}
 
     function saveService() {
         const formData = {

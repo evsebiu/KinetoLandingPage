@@ -17,6 +17,7 @@ public class ServiceDetailsMapper {
         }
 
         ServiceDetailsDTO dto = new ServiceDetailsDTO();
+        dto.setId(entity.getId());
         dto.setNumeServiciu(entity.getNumeServiciu());
         dto.setDescriereServiciu(entity.getDescriereServiciu());
         dto.setPretServiciu(entity.getPretServiciu());
@@ -31,6 +32,7 @@ public class ServiceDetailsMapper {
         }
 
         ServiceDetails entity = new ServiceDetails();
+        entity.setId(dto.getId());
         entity.setNumeServiciu(dto.getNumeServiciu());
         entity.setPretServiciu(dto.getPretServiciu());
         entity.setDescriereServiciu(dto.getDescriereServiciu());

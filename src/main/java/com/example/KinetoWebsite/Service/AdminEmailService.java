@@ -44,8 +44,7 @@ public class AdminEmailService {
                 appointmentDTO.getServiceName(),
                 appointmentDTO.getPhoneNumber(),
                 appointmentDTO.getAdditionalInfo(),
-                appointmentDTO.getTime(),
-                java.time.LocalTime.now()
+                appointmentDTO.getTime()
         );
     }
 }

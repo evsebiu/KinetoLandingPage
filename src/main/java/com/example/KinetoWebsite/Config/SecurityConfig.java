@@ -23,9 +23,12 @@ public class SecurityConfig {
                                 "/error",
                                 "/favicon.ico",
                                 "/login",
-                                "/public", // ← ADD THIS LINE
+                                "/public",
                                 "/css/**",
                                 "/js/**",
+
+                                "/api/appointments/**",
+                                "/api/services/**",
 
                                 // Swagger UI and API docs
                                 "/swagger-ui.html",

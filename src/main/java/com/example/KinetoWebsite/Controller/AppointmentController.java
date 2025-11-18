@@ -68,7 +68,7 @@ public class AppointmentController {
                     savedAppointment.getDate(),
                     savedAppointment.getAdditionalInfo()
             );
-            emailService.sendAdminNotification(subject, body);
+            //emailService.sendAdminNotification(subject, body);
 
             return ResponseEntity.ok(savedAppointment);
 

@@ -8,335 +8,92 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
-            --info-color: #17a2b8;
-        }
+        :root { --primary: #667eea; --secondary: #764ba2; --success: #28a745; --warning: #ffc107; --danger: #dc3545; --info: #17a2b8; }
+        body { background-color: #f8f9fa; }
+        .sidebar { min-height: 100vh; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); }
+        .sidebar .nav-link { color: #fff; padding: 15px 20px; margin: 5px 0; transition: 0.3s; border-radius: 5px; }
+        .sidebar .nav-link:hover { background: rgba(255,255,255,0.1); transform: translateX(5px); }
+        .sidebar .nav-link.active { background: rgba(255,255,255,0.2); font-weight: 600; }
 
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        }
+        .stat-card { border: none; border-radius: 15px; transition: 0.3s; overflow: hidden; color: white; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .stat-icon { width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
 
-        .sidebar .nav-link {
-            color: #fff;
-            padding: 15px 20px;
-            border-radius: 5px;
-            margin: 5px 0;
-            transition: all 0.3s ease;
-        }
+        .chart-box { background: white; border-radius: 15px; padding: 1.5rem; box-shadow: 0 5px 15px rgba(0,0,0,0.05); height: 100%; }
+        .dashboard-header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 2rem 0; margin-bottom: 2rem; border-radius: 0 0 20px 20px; }
 
-        .sidebar .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-            transform: translateX(5px);
-        }
-
-        .sidebar .nav-link.active {
-            background: rgba(255,255,255,0.2);
-            font-weight: 600;
-        }
-
-        .stat-card {
-            border-radius: 15px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: none;
-            overflow: hidden;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-
-        .stat-card .card-body {
-            padding: 1.5rem;
-        }
-
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .chart-container {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            margin-bottom: 1.5rem;
-        }
-
-        .recent-appointment {
-            border-left: 4px solid var(--primary-color);
-            transition: all 0.3s ease;
-        }
-
-        .recent-appointment:hover {
-            background-color: #f8f9fa;
-            transform: translateX(5px);
-        }
-
-        .status-badge {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-        }
-
-        .loading-spinner {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 3rem;
-        }
-
-        .dashboard-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            border-radius: 0 0 20px 20px;
-        }
-
-        .quick-stats {
-            margin-bottom: 2rem;
-        }
-
-        .refresh-btn {
-            background: var(--primary-color);
-            border: none;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            transition: all 0.3s ease;
-        }
-
-        .refresh-btn:hover {
-            background: var(--secondary-color);
-            transform: scale(1.05);
-        }
+        .recent-item { border-left: 4px solid var(--primary); transition: 0.2s; background: #f8f9fa; }
+        .recent-item:hover { transform: translateX(5px); background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .refresh-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; border-radius: 20px; padding: 5px 15px; transition: 0.3s; }
+        .refresh-btn:hover { background: white; color: var(--primary); }
     </style>
 </head>
 <body>
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar -->
-        <nav th:fragment="sidebar(activePage)" class="col-md-3 col-lg-2 d-md-block sidebar p-0 shadow-lg">
+        <nav th:fragment="sidebar(activePage)" class="col-md-3 col-lg-2 d-md-block sidebar p-0 collapse">
             <div class="position-sticky pt-3">
                 <div class="text-center p-4 border-bottom border-white border-opacity-25">
                     <i class="fas fa-hand-holding-medical fa-2x text-white mb-2"></i>
-                    <h4 class="text-white mb-0">Kineto Admin</h4>
-                    <small class="text-white text-opacity-75">Management Platform</small>
+                    <h4 class="text-white m-0">Kineto Admin</h4>
                 </div>
                 <ul class="nav flex-column px-3 mt-4">
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           th:classappend="${activePage == 'dashboard'} ? 'active' : ''"
-                           href="/admin/dashboard">
-                            <i class="fas fa-tachometer-alt me-2"></i>
-                            Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           th:classappend="${activePage == 'appointments'} ? 'active' : ''"
-                           href="/admin/appointments">
-                            <i class="fas fa-calendar-check me-2"></i>
-                            Programări
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           th:classappend="${activePage == 'services'} ? 'active' : ''"
-                           href="/admin/services">
-                            <i class="fas fa-spa me-2"></i>
-                            Servicii
+                    <li class="nav-item" th:each="item : ${ {'dashboard', 'appointments', 'services'} }">
+                        <a class="nav-link text-capitalize" th:classappend="${activePage == item} ? 'active'" th:href="@{'/admin/' + ${item}}">
+                            <i th:class="${'fas fa-' + (item == 'dashboard' ? 'tachometer-alt' : (item == 'appointments' ? 'calendar-check' : 'spa')) + ' me-2'}"></i>
+                            <span th:text="${item}">Page</span>
                         </a>
                     </li>
                 </ul>
                 <div class="p-3 mt-5 border-top border-white border-opacity-25">
-                    <a class="btn btn-outline-light w-100" href="/logout">
-                        <i class="fas fa-sign-out-alt me-2"></i>
-                        Deconectare
-                    </a>
+                    <a class="btn btn-outline-light w-100" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Deconectare</a>
                 </div>
             </div>
         </nav>
 
-        <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <!-- Dashboard Header -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pb-4">
             <div class="dashboard-header">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h1 class="h2 mb-1"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h1>
-                        <p class="mb-0 opacity-75">Vizualizare completă a activității platformei</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 mb-0"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h1>
+                        <small class="opacity-75">Vizualizare completă a activității</small>
                     </div>
-                    <div class="col-auto">
-                        <button class="refresh-btn" onclick="loadDashboardData()">
-                            <i class="fas fa-sync-alt me-1"></i>Actualizează
-                        </button>
-                    </div>
+                    <button class="refresh-btn" onclick="App.init()"><i class="fas fa-sync-alt me-1"></i> Refresh</button>
                 </div>
             </div>
 
-            <!-- Quick Stats Row -->
-            <div class="row quick-stats">
-                <div class="col-md-3 mb-4">
-                    <div class="card stat-card text-white bg-primary">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="card-title mb-2">Total Programări</h6>
-                                    <h2 class="mb-0" id="totalAppointments">0</h2>
-                                    <small class="opacity-75">Toate timpurile</small>
-                                </div>
-                                <div class="stat-icon bg-white bg-opacity-20">
-                                    <i class="fas fa-calendar-check"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <div class="card stat-card text-white bg-success">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="card-title mb-2">Programări Astăzi</h6>
-                                    <h2 class="mb-0" id="todayAppointments">0</h2>
-                                    <small class="opacity-75">Data curentă</small>
-                                </div>
-                                <div class="stat-icon bg-white bg-opacity-20">
-                                    <i class="fas fa-calendar-day"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <div class="card stat-card text-white bg-warning">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="card-title mb-2">Programări Noi</h6>
-                                    <h2 class="mb-0" id="newAppointments">0</h2>
-                                    <small class="opacity-75">Status "Nou"</small>
-                                </div>
-                                <div class="stat-icon bg-white bg-opacity-20">
-                                    <i class="fas fa-bell"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <div class="card stat-card text-white bg-info">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="card-title mb-2">Total Servicii</h6>
-                                    <h2 class="mb-0" id="totalServices">0</h2>
-                                    <small class="opacity-75">Servicii active</small>
-                                </div>
-                                <div class="stat-icon bg-white bg-opacity-20">
-                                    <i class="fas fa-spa"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="row g-3 mb-4" id="quickStatsContainer">
             </div>
 
-            <!-- Charts and Detailed Stats -->
-            <div class="row">
-                <!-- Left Column - Charts -->
+            <div class="row g-4">
                 <div class="col-lg-8">
-                    <!-- Status Distribution Chart -->
-                    <div class="chart-container">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="mb-0">Distribuție Status Programări</h5>
-                            <small class="text-muted">Ultimele 30 de zile</small>
-                        </div>
-                        <canvas id="statusChart" height="250"></canvas>
+                    <div class="chart-box mb-4">
+                        <h5 class="card-title mb-3">Distribuție Status</h5>
+                        <canvas id="statusChart" style="max-height: 250px;"></canvas>
                     </div>
-
-                    <!-- Monthly Appointments Chart -->
-                    <div class="chart-container">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="mb-0">Evoluție Programări Lunare</h5>
-                            <small class="text-muted">Anul curent</small>
-                        </div>
-                        <canvas id="monthlyChart" height="250"></canvas>
+                    <div class="chart-box">
+                        <h5 class="card-title mb-3">Evoluție Lunară</h5>
+                        <canvas id="monthlyChart" style="max-height: 250px;"></canvas>
                     </div>
                 </div>
 
-                <!-- Right Column - Recent Activity -->
                 <div class="col-lg-4">
-                    <!-- Recent Appointments -->
-                    <div class="chart-container">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="mb-0">Programări Recente</h5>
+                    <div class="chart-box mb-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h5 class="mb-0">Recente</h5>
                             <span class="badge bg-primary" id="recentCount">0</span>
                         </div>
-                        <div id="recentAppointmentsList" class="loading-spinner">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </div>
+                        <div id="recentList" class="vstack gap-2"></div>
                     </div>
 
-                    <!-- Service Popularity -->
-                    <div class="chart-container">
+                    <div class="chart-box mb-4">
                         <h5 class="mb-3">Servicii Populare</h5>
-                        <div id="servicePopularity">
-                            <div class="loading-spinner">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                        </div>
+                        <div id="popularServices" class="vstack gap-2"></div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Detailed Statistics -->
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="chart-container">
+                    <div class="chart-box">
                         <h5 class="mb-3">Statistici Detaliate</h5>
-                        <div class="row text-center">
-                            <div class="col-md-3 mb-3">
-                                <div class="border rounded p-3">
-                                    <h3 class="text-primary mb-1" id="confirmedCount">0</h3>
-                                    <small class="text-muted">Confirmate</small>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="border rounded p-3">
-                                    <h3 class="text-success mb-1" id="completedCount">0</h3>
-                                    <small class="text-muted">Finalizate</small>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="border rounded p-3">
-                                    <h3 class="text-danger mb-1" id="cancelledCount">0</h3>
-                                    <small class="text-muted">Anulate</small>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="border rounded p-3">
-                                    <h3 class="text-warning mb-1" id="pendingCount">0</h3>
-                                    <small class="text-muted">În așteptare</small>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="row text-center g-2" id="detailedStats"></div>
                     </div>
                 </div>
             </div>
@@ -346,343 +103,167 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Global variables
-    let appointments = [];
-    let services = [];
-    let statusChart, monthlyChart;
+    const App = {
+        charts: {},
 
-    // API call utility
-    async function apiCall(url, method = 'GET') {
-        try {
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+        // Configurare culori și mapări
+        config: {
+            colors: { NOU: '#ffc107', CONFIRMAT: '#28a745', FINALIZAT: '#6c757d', ANULAT: '#dc3545' },
+            labels: { NOU: 'Nou', CONFIRMAT: 'Confirmat', FINALIZAT: 'Finalizat', ANULAT: 'Anulat' }
+        },
+
+        async init() {
+            this.showLoading(true);
+            try {
+                const [services, appointments] = await Promise.all([
+                    this.fetch('/api/public/services'),
+                    this.fetch('/api/appointments')
+                ]);
+                this.processAndRender(appointments, services);
+                this.toast('Date actualizate', 'success');
+            } catch (e) {
+                console.error(e);
+                this.toast('Eroare la încărcare', 'danger');
+            } finally {
+                this.showLoading(false);
+            }
+        },
+
+        async fetch(url) {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(res.statusText);
+            return res.json();
+        },
+
+        processAndRender(apps, services) {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const currentYear = new Date().getFullYear();
+
+            // Calculare eficientă într-o singură trecere (Reduce)
+            const stats = apps.reduce((acc, app) => {
+                // Quick Stats
+                acc.total++;
+                if (app.date === todayStr) acc.today++;
+                if (app.status === 'NOU') acc.new++;
+
+                // Status Counts
+                acc.status[app.status] = (acc.status[app.status] || 0) + 1;
+
+                // Monthly Data
+                const d = new Date(app.date);
+                if (d.getFullYear() === currentYear) acc.monthly[d.getMonth()]++;
+
+                // Service Popularity
+                const sName = app.serviceName || 'Necunoscut';
+                acc.services[sName] = (acc.services[sName] || 0) + 1;
+
+                return acc;
+            }, { total: 0, today: 0, new: 0, status: {}, monthly: Array(12).fill(0), services: {} });
+
+            // Render UI components
+            this.renderQuickStats(stats, services.length);
+            this.renderCharts(stats);
+            this.renderRecent(apps);
+            this.renderPopular(stats.services);
+            this.renderDetailed(stats.status);
+        },
+
+        renderQuickStats(stats, totalServices) {
+            const items = [
+                { title: 'Total Programări', val: stats.total, icon: 'calendar-check', color: 'primary' },
+                { title: 'Programări Astăzi', val: stats.today, icon: 'calendar-day', color: 'success' },
+                { title: 'Programări Noi', val: stats.new, icon: 'bell', color: 'warning' },
+                { title: 'Total Servicii', val: totalServices, icon: 'spa', color: 'info' }
+            ];
+
+            document.getElementById('quickStatsContainer').innerHTML = items.map(i => `
+                <div class="col-md-3">
+                    <div class="card stat-card bg-${i.color} p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div><h6 class="mb-1">${i.title}</h6><h2 class="mb-0">${i.val}</h2></div>
+                            <div class="stat-icon"><i class="fas fa-${i.icon}"></i></div>
+                        </div>
+                    </div>
+                </div>`).join('');
+        },
+
+        renderCharts(stats) {
+            // Status Doughnut
+            this.createChart('statusChart', 'doughnut', {
+                labels: Object.keys(this.config.labels).map(k => this.config.labels[k]),
+                datasets: [{
+                    data: ['NOU', 'CONFIRMAT', 'FINALIZAT', 'ANULAT'].map(k => stats.status[k] || 0),
+                    backgroundColor: Object.values(this.config.colors)
+                }]
             });
 
-            if (!response.ok) {
-                throw new Error(`API Error ${response.status}: ${response.statusText}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error(`Error in API call to ${url}:`, error);
-            showNotification('Eroare la încărcarea datelor', 'danger');
-            throw error;
-        }
-    }
-
-    // Notification system
-    function showNotification(message, type = 'info') {
-        // Create toast notification
-        const toast = document.createElement('div');
-        toast.className = `toast align-items-center text-bg-${type} border-0 position-fixed top-0 end-0 m-3`;
-        toast.style.zIndex = '1060';
-        toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        `;
-
-        document.body.appendChild(toast);
-        const bsToast = new bootstrap.Toast(toast);
-        bsToast.show();
-
-        // Remove toast after hide
-        toast.addEventListener('hidden.bs.toast', () => {
-            toast.remove();
-        });
-    }
-
-    // Load all dashboard data
-    async function loadDashboardData() {
-        try {
-            showLoadingState(true);
-
-            // Load services and appointments in parallel
-            [services, appointments] = await Promise.all([
-                apiCall('/api/public/services'),
-                apiCall('/api/appointments')
-            ]);
-
-            updateQuickStats();
-            updateDetailedStats();
-            renderRecentAppointments();
-            renderServicePopularity();
-            renderCharts();
-
-            showNotification('Datele au fost actualizate cu succes', 'success');
-
-        } catch (error) {
-            console.error('Error loading dashboard data:', error);
-        } finally {
-            showLoadingState(false);
-        }
-    }
-
-    // Update quick statistics
-    function updateQuickStats() {
-        const today = new Date().toISOString().split('T')[0];
-
-        // Total appointments
-        document.getElementById('totalAppointments').textContent = appointments.length;
-
-        // Today's appointments
-        const todayApps = appointments.filter(app => app.date === today);
-        document.getElementById('todayAppointments').textContent = todayApps.length;
-
-        // New appointments (status = "NOU")
-        const newApps = appointments.filter(app => app.status === 'NOU');
-        document.getElementById('newAppointments').textContent = newApps.length;
-
-        // Total services
-        document.getElementById('totalServices').textContent = services.length;
-    }
-
-    // Update detailed statistics
-    function updateDetailedStats() {
-        const confirmed = appointments.filter(app => app.status === 'CONFIRMAT').length;
-        const completed = appointments.filter(app => app.status === 'FINALIZAT').length;
-        const cancelled = appointments.filter(app => app.status === 'ANULAT').length;
-        const pending = appointments.filter(app => app.status === 'NOU').length;
-
-        document.getElementById('confirmedCount').textContent = confirmed;
-        document.getElementById('completedCount').textContent = completed;
-        document.getElementById('cancelledCount').textContent = cancelled;
-        document.getElementById('pendingCount').textContent = pending;
-    }
-
-    // Render recent appointments
-    function renderRecentAppointments() {
-        const container = document.getElementById('recentAppointmentsList');
-        const recentApps = appointments
-            .sort((a, b) => new Date(b.date + 'T' + (b.time || '00:00')) - new Date(a.date + 'T' + (a.time || '00:00')))
-            .slice(0, 8);
-
-        document.getElementById('recentCount').textContent = recentApps.length;
-
-        if (recentApps.length === 0) {
-            container.innerHTML = '<p class="text-muted text-center py-3">Nu există programări recente</p>';
-            return;
-        }
-
-        container.innerHTML = recentApps.map(app => `
-            <div class="recent-appointment bg-light p-3 mb-2 rounded">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <strong class="text-truncate me-2">${app.patientName || 'Necunoscut'}</strong>
-                    <span class="badge ${getStatusBadgeClass(app.status)} status-badge">${getStatusText(app.status)}</span>
-                </div>
-                <div class="small text-muted mb-1">
-                    <i class="fas fa-phone me-1"></i>${app.phoneNumber || 'N/A'}
-                </div>
-                <div class="small text-muted mb-1">
-                    <i class="fas fa-calendar me-1"></i>${formatDate(app.date)} ${app.time ? `la ${app.time}` : ''}
-                </div>
-                <div class="small text-truncate">
-                    ${app.serviceName || 'Serviciu necunoscut'}
-                </div>
-            </div>
-        `).join('');
-    }
-
-    // Render service popularity
-    function renderServicePopularity() {
-        const container = document.getElementById('servicePopularity');
-
-        // Count appointments by service
-        const serviceCounts = {};
-        appointments.forEach(app => {
-            const serviceName = app.serviceName || 'Necunoscut';
-            serviceCounts[serviceName] = (serviceCounts[serviceName] || 0) + 1;
-        });
-
-        const popularServices = Object.entries(serviceCounts)
-            .sort(([,a], [,b]) => b - a)
-            .slice(0, 5);
-
-        if (popularServices.length === 0) {
-            container.innerHTML = '<p class="text-muted text-center py-3">Nu există date</p>';
-            return;
-        }
-
-        container.innerHTML = popularServices.map(([service, count]) => `
-            <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
-                <span class="text-truncate me-2">${service}</span>
-                <span class="badge bg-primary">${count}</span>
-            </div>
-        `).join('');
-    }
-
-    // Render charts
-    function renderCharts() {
-        renderStatusChart();
-        renderMonthlyChart();
-    }
-
-    function renderStatusChart() {
-        const ctx = document.getElementById('statusChart').getContext('2d');
-
-        // Destroy existing chart if it exists
-        if (statusChart) {
-            statusChart.destroy();
-        }
-
-        const statusCounts = {
-            'NOU': 0,
-            'CONFIRMAT': 0,
-            'FINALIZAT': 0,
-            'ANULAT': 0
-        };
-
-        appointments.forEach(app => {
-            statusCounts[app.status] = (statusCounts[app.status] || 0) + 1;
-        });
-
-        statusChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Noi', 'Confirmate', 'Finalizate', 'Anulate'],
-                datasets: [{
-                    data: [statusCounts.NOU, statusCounts.CONFIRMAT, statusCounts.FINALIZAT, statusCounts.ANULAT],
-                    backgroundColor: [
-                        '#ffc107',
-                        '#28a745',
-                        '#6c757d',
-                        '#dc3545'
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#fff'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                    }
-                }
-            }
-        });
-    }
-
-    function renderMonthlyChart() {
-        const ctx = document.getElementById('monthlyChart').getContext('2d');
-
-        // Destroy existing chart if it exists
-        if (monthlyChart) {
-            monthlyChart.destroy();
-        }
-
-        // Get current year appointments
-        const currentYear = new Date().getFullYear();
-        const monthlyData = new Array(12).fill(0);
-
-        appointments.forEach(app => {
-            if (app.date) {
-                const date = new Date(app.date);
-                if (date.getFullYear() === currentYear) {
-                    monthlyData[date.getMonth()]++;
-                }
-            }
-        });
-
-        monthlyChart = new Chart(ctx, {
-            type: 'line',
-            data: {
+            // Monthly Line
+            this.createChart('monthlyChart', 'line', {
                 labels: ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun', 'Iul', 'Aug', 'Sep', 'Oct', 'Noi', 'Dec'],
                 datasets: [{
-                    label: 'Programări',
-                    data: monthlyData,
-                    borderColor: '#667eea',
-                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
+                    label: 'Programări', data: stats.monthly,
+                    borderColor: '#667eea', backgroundColor: 'rgba(102, 126, 234, 0.1)', fill: true, tension: 0.4
                 }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                }
-            }
-        });
-    }
+            });
+        },
 
-    // Utility functions
-    function getStatusBadgeClass(status) {
-        const statusMap = {
-            'NOU': 'bg-warning',
-            'CONFIRMAT': 'bg-success',
-            'FINALIZAT': 'bg-secondary',
-            'ANULAT': 'bg-danger'
-        };
-        return statusMap[status] || 'bg-secondary';
-    }
+        renderRecent(apps) {
+            const recent = [...apps].sort((a, b) => new Date(b.date + 'T' + (b.time || '00:00')) - new Date(a.date + 'T' + (a.time || '00:00'))).slice(0, 6);
+            document.getElementById('recentCount').innerText = recent.length;
 
-    function getStatusText(status) {
-        const statusMap = {
-            'NOU': 'Nou',
-            'CONFIRMAT': 'Confirmat',
-            'FINALIZAT': 'Finalizat',
-            'ANULAT': 'Anulat'
-        };
-        return statusMap[status] || status;
-    }
+            document.getElementById('recentList').innerHTML = recent.length ? recent.map(app => `
+                <div class="recent-item p-2 rounded">
+                    <div class="d-flex justify-content-between">
+                        <strong class="text-truncate">${app.patientName}</strong>
+                        <span class="badge bg-${app.status === 'NOU' ? 'warning' : 'secondary'}">${this.config.labels[app.status] || app.status}</span>
+                    </div>
+                    <small class="text-muted d-block"><i class="fas fa-clock me-1"></i>${app.date} ${app.time || ''} • ${app.serviceName}</small>
+                </div>`).join('') : '<p class="text-center text-muted">Nu sunt date.</p>';
+        },
 
-    function formatDate(dateString) {
-        if (!dateString) return 'N/A';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('ro-RO');
-    }
+        renderPopular(serviceStats) {
+            const sorted = Object.entries(serviceStats).sort(([,a], [,b]) => b - a).slice(0, 5);
+            document.getElementById('popularServices').innerHTML = sorted.map(([name, count]) => `
+                <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                    <span class="text-truncate small w-75">${name}</span>
+                    <span class="badge bg-primary rounded-pill">${count}</span>
+                </div>`).join('');
+        },
 
-    function showLoadingState(show) {
-        const elements = document.querySelectorAll('.loading-spinner');
-        elements.forEach(el => {
-            if (show) {
-                el.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
-            }
-        });
-    }
+        renderDetailed(statusStats) {
+            const map = { CONFIRMAT: 'primary', FINALIZAT: 'success', ANULAT: 'danger', NOU: 'warning' };
+            document.getElementById('detailedStats').innerHTML = Object.entries(map).map(([key, color]) => `
+                <div class="col-6">
+                    <div class="border rounded p-2">
+                        <h4 class="text-${color} mb-0">${statusStats[key] || 0}</h4>
+                        <small class="text-muted" style="font-size:0.7rem">${this.config.labels[key]}</small>
+                    </div>
+                </div>`).join('');
+        },
 
-    // Auto-refresh every 30 seconds
-    let autoRefreshInterval;
+        createChart(id, type, data) {
+            if (this.charts[id]) this.charts[id].destroy();
+            this.charts[id] = new Chart(document.getElementById(id), { type, data, options: { responsive: true, plugins: { legend: { position: 'bottom', display: type === 'doughnut' } } } });
+        },
 
-    function startAutoRefresh() {
-        autoRefreshInterval = setInterval(loadDashboardData, 30000);
-    }
+        toast(msg, type = 'info') {
+            const el = document.createElement('div');
+            el.className = `toast align-items-center text-bg-${type} border-0 position-fixed top-0 end-0 m-3 show`;
+            el.innerHTML = `<div class="d-flex"><div class="toast-body">${msg}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 3000);
+        },
 
-    function stopAutoRefresh() {
-        if (autoRefreshInterval) {
-            clearInterval(autoRefreshInterval);
+        showLoading(isActive) {
+            document.body.style.cursor = isActive ? 'wait' : 'default';
+            // Opțional: poți adăuga un spinner overlay aici
         }
-    }
+    };
 
-    // Initialize dashboard
-    document.addEventListener('DOMContentLoaded', function() {
-        loadDashboardData();
-        startAutoRefresh();
-
-        // Stop auto-refresh when page is not visible
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                stopAutoRefresh();
-            } else {
-                startAutoRefresh();
-            }
-        });
+    // Start
+    document.addEventListener('DOMContentLoaded', () => {
+        App.init();
+        setInterval(() => !document.hidden && App.init(), 30000);
     });
 </script>
 </body>
