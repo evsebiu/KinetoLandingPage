@@ -59,19 +59,20 @@ public class AppointmentServiceImpl implements AppointmentService{
         String subject = "Appointment confirmation " + appointmentDTO.getPatientName();
 
         String body = String.format(
-                "Dear %s,\n\n" +
-                        "new appointment!\n\n" +
-                        "Patient name:\n" +
-                        "Service: %s\n" +
-                        "Phone number: %s\n" +
-                        "Additional info: %s\n" +
-                        "End Time: %s\n\n" +
-                        "Thank you for choosing our service!",
+                "Programare noua pe website! \n" +
+                        "\nVerifica admin dashboard - programari\n\n" +
+                        "Numele clientului:%s\n" +
+                        "Serviciul ales: %s\n" +
+                        "Numar de telefon: %s\n" +
+                        "Informatii aditionale introduse de client: %s\n" +
+                        "Data selectata de client: %s\n\n" +
+                        "Nu uita sa iti manageriezi starea programarii in dashboard.\n\n"+
+                        "\napp powered by @evsebiu",
                 appointmentDTO.getPatientName(),
                 appointmentDTO.getServiceName(),
                 appointmentDTO.getPhoneNumber(),
                 appointmentDTO.getAdditionalInfo(),
-                appointmentDTO.getTime()
+                appointmentDTO.getDate()
         );
         emailService.sendAdminNotification(subject,body);
     }
