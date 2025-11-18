@@ -35,7 +35,7 @@ public class AdminEmailService {
                     <p>We look forward to seeing you!</p>
                 </div>
                 <div class="footer">
-                    <p>Best regards,<br>Your Company Name</p>
+                    <p>Best regards,<br>VanuKineto</p>
                 </div>
             </body>
             </html>
