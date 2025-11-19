@@ -24,6 +24,7 @@ public class RecaptchaService {
     private static final String RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
 
     public boolean verifyRecaptcha(String recaptchaResponse){
+
         if (recaptchaResponse == null || recaptchaResponse.isEmpty()){
             return false;
         }
@@ -40,8 +41,11 @@ public class RecaptchaService {
                     requestParams
             );
 
-            if (response != null && (boolean) response.get("success")){
-                return true;
+            if (response != null && response.containsKey("success")){
+                Object successsObj = response.get("success");
+                if (successsObj instanceof Boolean){
+                    return (Boolean) successsObj;
+                }
             }
         } catch (Exception e){
             System.err.println("reCaptcha verification failed " + e.getMessage());

@@ -4,7 +4,6 @@ import com.example.KinetoWebsite.Service.RecaptchaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -14,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -53,4 +53,44 @@ public class RecaptchaServiceTest {
         //assert
         assertTrue(result);
     }
+
+    @Test
+    void verifyRecaptcha_WhenTokenIsInvalid_ShouldReturnFalse(){
+        //Arrange
+        String invalidToken = "invalid-token";
+        Map<String, Object> googleResponse = new HashMap<>();
+        googleResponse.put("success", false);
+
+        when(restTemplate.postForObject(
+                any(String.class),
+                nullable(Object.class),
+                any(Class.class),
+                any(Map.class)
+                )).thenReturn(googleResponse);
+
+        //act
+        boolean restult = recaptchaService.verifyRecaptcha(invalidToken);
+
+        assertFalse(restult);
+    }
+
+    @Test
+    void verifyRecaptcha_WhenTokenIsNull_ShouldReturnFalse(){
+        //Arrange
+        String token = "any-token";
+
+
+        when(restTemplate.postForObject(
+                any(String.class),
+                nullable(Object.class),
+                any(Class.class),
+                any(Map.class)
+        )).thenReturn(null);
+
+        //act
+        boolean result = recaptchaService.verifyRecaptcha(token);
+
+        assertFalse(result);
+    }
+
 }
