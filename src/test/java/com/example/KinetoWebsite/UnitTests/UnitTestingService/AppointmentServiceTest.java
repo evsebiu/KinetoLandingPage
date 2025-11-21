@@ -38,5 +38,12 @@ public class AppointmentServiceTest {
        sampleDTO.setDate(LocalDate.ofEpochDay(21-12-2025));
        sampleDTO.setPhoneNumber("+4999999999");
        sampleDTO.setPatientName("Matei Ion");
+       sampleDTO.setAdditionalInfo("No extra info.");
+
+       sampleEntity=new Appointment();
+       sampleEntity.setId(10L);
+       sampleEntity.setServiceName("Masaj cu uleiuri");
+       sampleEntity.setPhoneNumber("4075541873");
+
    }
 }
